@@ -1,0 +1,58 @@
+---
+import Icon from './Icon.astro';
+import { inventado, marca } from '@/lib/maqueta';
+
+interface Props {
+  texto: string;
+  enlace?: string | undefined;
+}
+const { texto, enlace } = Astro.props;
+---
+
+<div class="announcement" role="region" aria-label="Aviso">
+  <div class="container announcement__inner">
+    <Icon name="megaphone" size={18} />
+    {enlace ? (
+      <a href={enlace}>
+        <span class={marca(inventado.aviso)}>{texto}</span>
+        <Icon name="arrowRight" size={16} />
+      </a>
+    ) : (
+      <p class={marca(inventado.aviso)}>{texto}</p>
+    )}
+  </div>
+</div>
+
+<style>
+  .announcement {
+    background: var(--navy-900);
+    color: var(--white);
+    font-size: var(--step--1);
+  }
+  .announcement__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 42px;
+    padding-block: 0.5rem;
+    text-align: center;
+  }
+  .announcement :global(svg) {
+    flex: none;
+    color: var(--gold-400);
+  }
+  .announcement a,
+  .announcement p {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    color: var(--white);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .announcement a:hover {
+    text-decoration: underline;
+  }
+</style>

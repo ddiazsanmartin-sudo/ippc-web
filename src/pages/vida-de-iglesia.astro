@@ -1,0 +1,169 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import coro from '@/assets/fotos/coro.jpg';
+import bendicion from '@/assets/fotos/culto-bendicion.jpg';
+import escuela from '@/assets/fotos/escuela-dominical-2.jpg';
+import ninos from '@/assets/fotos/ninos.jpg';
+import oracion from '@/assets/fotos/oracion.jpg';
+import EventCard from '@/components/EventCard.astro';
+import HidePastEvents from '@/components/HidePastEvents.astro';
+import Icon from '@/components/Icon.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { inventado, marca } from '@/lib/maqueta';
+import { splitByTime } from '@/lib/dates';
+
+const ministerios = (await getCollection('ministerios')).sort((a, b) => a.data.orden - b.data.orden);
+const { upcoming } = splitByTime(await getCollection('actividades'));
+---
+
+<BaseLayout
+  title="Vida de iglesia"
+  description="Escuela dominical, catecismo, estudios bíblicos, pastorales (juvenil, mujeres, hombres, reunión en casa) y evangelismo."
+>
+  <PageHeader
+    eyebrow="Vida de iglesia"
+    title="Una familia pactual que crece junta"
+    lead="Nuestra vida como comunidad de fe no se limita al culto dominical: crecemos juntos en la Palabra, la oración y el cuidado mutuo."
+    image={escuela}
+    alt="Niños y maestras en una actividad de la Escuela Dominical."
+  />
+
+  <section class="section">
+    <div class="container">
+      <SectionHead eyebrow="Ministerios y pastorales" title="Hay un lugar para ti" center titleInventado>
+        <p class={`lead ${marca(true) ?? ''}`}>
+          Desde los más pequeños hasta los mayores, cada miembro de la familia de la fe tiene un espacio para aprender, servir y crecer.
+        </p>
+      </SectionHead>
+      <ul class="ministries" role="list">
+        {ministerios.map((m) => (
+          <li class="ministry">
+            <div class="ministry__media">
+              <Image src={m.data.imagen} alt={m.data.imagen_alt} width={520} height={360} class="ministry__img" />
+            </div>
+            <div class="ministry__body">
+              <h3>{m.data.nombre}</h3>
+              <p class={marca(inventado.ministeriosResumen.has(m.id))}>{m.data.resumen}</p>
+              {m.data.horario && (
+                <p class="ministry__time">
+                  <Icon name="clock" size={16} /> {m.data.horario}
+                </p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--cream" aria-labelledby="proximas">
+    <div class="container">
+      <div class="split-head">
+        <SectionHead eyebrow="Calendario congregacional" title="Próximas actividades" id="proximas" />
+        <a class="btn btn--outline btn--sm" href="/actividades">
+          <Icon name="calendar" /> Ver todas
+        </a>
+      </div>
+      {upcoming.length > 0 && (
+        <div class="grid grid--3" data-event-list>
+          {upcoming.slice(0, 6).map((e) => (
+            <EventCard event={e} />
+          ))}
+        </div>
+      )}
+      <p class="empty" data-event-empty hidden={upcoming.length > 0}>
+        Pronto publicaremos nuevas actividades.
+      </p>
+    </div>
+  </section>
+
+  <section class="gallery" aria-label="Galería de la congregación">
+    <Image src={bendicion} alt="La congregación de pie recibiendo la bendición al final del culto." width={800} height={450} />
+    <Image src={coro} alt="El coro de la iglesia cantando junto a la mesa de la comunión." width={800} height={450} />
+    <Image src={oracion} alt="Hermanos arrodillados en oración." width={450} height={800} />
+    <Image src={ninos} alt="Niños de la iglesia reunidos frente a la congregación." width={800} height={600} />
+  </section>
+
+  <HidePastEvents />
+</BaseLayout>
+
+<style>
+  .ministries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  }
+  .ministry {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--white);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+  .ministry__media {
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+  }
+  .ministry :global(.ministry__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ministry__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.35rem 1.5rem 1.5rem;
+  }
+  .ministry h3 {
+    font-size: var(--step-2);
+    margin-bottom: 0.35rem;
+  }
+  .ministry p {
+    font-size: 0.96rem;
+  }
+  .ministry__time {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: auto 0 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem !important;
+    font-weight: 600;
+    color: var(--ink-500);
+  }
+  .ministry__time :global(svg) {
+    color: var(--gold-700);
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: 1.3fr 1.3fr 0.7fr 1.1fr;
+    /* Fila del alto del contenedor: sin esto la foto crece a su alto natural y se monta sobre lo que sigue. */
+    grid-template-rows: minmax(0, 1fr);
+    height: clamp(14rem, 26vw, 22rem);
+  }
+  .gallery :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 760px) {
+    .gallery {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: none;
+      height: auto;
+    }
+    .gallery :global(img) {
+      aspect-ratio: 1;
+    }
+  }
+</style>

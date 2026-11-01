@@ -1,0 +1,573 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import biblia from '@/assets/fotos/biblia-abierta.jpg';
+import escuela from '@/assets/fotos/escuela-dominical-2.jpg';
+import fachada from '@/assets/fotos/templo-fachada.jpg';
+import mesa from '@/assets/fotos/mesa-comunion.jpg';
+import emblema from '@/assets/marca/logo-solo.png';
+import EventCard from '@/components/EventCard.astro';
+import HidePastEvents from '@/components/HidePastEvents.astro';
+import Icon from '@/components/Icon.astro';
+import PhotoCard from '@/components/PhotoCard.astro';
+import ScheduleCards from '@/components/ScheduleCards.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import SermonPlayer from '@/components/SermonPlayer.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { inventado, marca } from '@/lib/maqueta';
+import Inventado from '@/components/Inventado.astro';
+import { splitByTime } from '@/lib/dates';
+import { cultoPrincipal, getInicio, getSitio } from '@/lib/content';
+
+const sitio = await getSitio();
+const inicio = await getInicio();
+const { upcoming } = splitByTime(await getCollection('actividades'));
+const proximas = upcoming.slice(0, 3);
+const [ultimoSermon] = (await getCollection('sermones')).sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+const culto = cultoPrincipal(sitio);
+const parrafos = inicio.bienvenida.texto.split(/\n{2,}/);
+---
+
+<BaseLayout title="Inicio">
+  <!-- HERO: frase cristocéntrica sobre la congregación reunida -->
+  <section class="hero on-dark">
+    <Image src={inicio.portada.imagen} alt={inicio.portada.alt} layout="full-width" class="hero__bg" loading="eager" fetchpriority="high" />
+    <div class="container hero__content">
+      <p class="eyebrow">Iglesia Presbiteriana · Maipú, Santiago</p>
+      <blockquote class="hero__verse">
+        <p>«{inicio.versiculo.texto}»</p>
+        <footer>
+          <cite>{inicio.versiculo.referencia}</cite>
+        </footer>
+      </blockquote>
+      <div class="btn-row">
+        <a class="btn btn--gold" href="/visitanos">
+          <Icon name="mapPin" /> Planifica tu visita
+        </a>
+        <a class="btn btn--ghost" href="/que-creemos">
+          Conoce lo que creemos
+        </a>
+      </div>
+    </div>
+    <div class="hero__strip">
+      <div class="container hero__strip-inner">
+        <p>
+          <Icon name="clock" size={20} />
+          <span>
+            <strong>{culto.nombre}</strong> · {culto.dia}s {culto.hora} hrs
+          </span>
+        </p>
+        <p>
+          <Icon name="mapPin" size={20} />
+          <span>
+            {sitio.direccion.calle}, {sitio.direccion.comuna}
+          </span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BIENVENIDA + IDENTIDAD -->
+  <section class="section">
+    <div class="container welcome">
+      <div class="welcome__text">
+        <p class="eyebrow">Bienvenido</p>
+        <h1 class="welcome__title">{inicio.bienvenida.titulo}</h1>
+        {parrafos.map((p, i) => (
+          <p class:list={{ lead: i === 0 }}>{p}</p>
+        ))}
+        <a class="link-arrow" href="/quienes-somos">
+          Conoce nuestra historia <Icon name="arrowRight" />
+        </a>
+      </div>
+      <aside class="identity" aria-labelledby="identidad-titulo">
+        <Image src={emblema} alt="" width={120} height={120} class="identity__emblem" />
+        <h2 id="identidad-titulo" class="identity__title">
+          Nuestra identidad
+        </h2>
+        <ul role="list">
+          {inicio.identidad.map((item) => (
+            <li>
+              <span class="identity__check">
+                <Icon name="check" size={18} />
+              </span>
+              <div>
+                <strong>{item.titulo}</strong>
+                <span class={marca(inventado.identidadTexto)}>{item.texto}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- HORARIOS -->
+  <section class="section section--cream" aria-labelledby="horarios">
+    <div class="container">
+      <SectionHead eyebrow="Horarios de culto" title="Te esperamos este domingo" id="horarios" center titleInventado>
+        <p class="lead">
+          No necesitas saber nada de antemano: solo ven como eres. Estamos en {sitio.direccion.calle}, {sitio.direccion.comuna}.
+        </p>
+      </SectionHead>
+      <ScheduleCards sitio={sitio} />
+      <p class="text-center schedule-cta">
+        <a class="btn btn--outline" href="/visitanos#como-llegar">
+          <Icon name="mapPin" /> Cómo llegar
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- CONOCE NUESTRA IGLESIA -->
+  <section class="section" aria-labelledby="conoce">
+    <div class="container">
+      <SectionHead eyebrow="Conócenos" title="Una Iglesia Presbiteriana" id="conoce">
+        <p class="lead">Bíblica, confesional, evangélica y misionera. Descubre quiénes somos y lo que confesamos.</p>
+      </SectionHead>
+      <div class="grid grid--4">
+        <PhotoCard
+          href="/quienes-somos"
+          image={fachada}
+          alt="Fachada del templo de ladrillo rojo en Alberto Llona 456, Maipú."
+          title="Quiénes somos"
+          text="Nuestra identidad, misión, visión y la historia de la congregación desde 2009."
+        />
+        <PhotoCard
+          href="/que-creemos"
+          image={biblia}
+          alt="Biblia abierta sobre la mesa, frente al púlpito."
+          title="Qué creemos"
+          text="La Escritura como autoridad final, la teología del pacto y las doctrinas de la gracia."
+        />
+        <PhotoCard
+          href="/culto-y-sacramentos"
+          image={mesa}
+          alt="Pan, copas y una Biblia abierta preparados para la Cena del Señor."
+          title="Culto y sacramentos"
+          text="Adoramos a Dios como Él lo ha ordenado: Palabra, oración, canto y sacramentos."
+        />
+        <PhotoCard
+          href="/vida-de-iglesia"
+          image={escuela}
+          alt="Niños trabajando en una actividad de Escuela Dominical."
+          title="Vida de iglesia"
+          text="Escuela dominical, catecismo, estudios bíblicos, pastorales y evangelismo."
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- TRES OFICIOS DE CRISTO -->
+  <section class="section section--navy offices" aria-labelledby="oficios">
+    <div class="container">
+      <SectionHead eyebrow="Nuestro ministerio" title="Como Cristo: Profeta, Sacerdote y Rey" id="oficios" center>
+        <p class="lead">Entendemos el ministerio de la iglesia en tres dimensiones que reflejan los tres oficios de Cristo.</p>
+      </SectionHead>
+      <ol class="offices__list" role="list">
+        <li>
+          <span class="offices__icon">
+            <Icon name="book" size={30} />
+          </span>
+          <h3>Enseña</h3>
+          <p class="offices__office">Cristo, Profeta</p>
+          <p>
+            Como Cristo enseña a su pueblo, <Inventado>proclamamos y enseñamos fielmente toda la Escritura.</Inventado>
+          </p>
+        </li>
+        <li>
+          <span class="offices__icon">
+            <Icon name="heart" size={30} />
+          </span>
+          <h3>Ministra</h3>
+          <p class="offices__office">Cristo, Sacerdote</p>
+          <p>
+            Como Cristo ama y sirve a su pueblo, <Inventado>nos cuidamos unos a otros en amor.</Inventado>
+          </p>
+        </li>
+        <li>
+          <span class="offices__icon">
+            <Icon name="crown" size={30} />
+          </span>
+          <h3>Pastorea</h3>
+          <p class="offices__office">Cristo, Rey</p>
+          <p>
+            Como Cristo dirige y pastorea a su iglesia, <Inventado>servimos bajo su gobierno y su Palabra.</Inventado>
+          </p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ÚLTIMO SERMÓN -->
+  {ultimoSermon && (
+    <section class="section section--soft" aria-labelledby="sermon">
+      <div class="container sermon">
+        <SermonPlayer sermon={ultimoSermon} />
+        <div class="sermon__text">
+          <p class="eyebrow">Último sermón</p>
+          <h2 id="sermon" class={marca(true)}>
+            La Palabra predicada
+          </h2>
+          <p class="lead">
+            La predicación expositiva ocupa el lugar central de nuestro culto: la Palabra de Dios, explicada fielmente texto por texto.
+          </p>
+          <dl class:list={['sermon__meta', marca(inventado.sermones.has(ultimoSermon.id))]}>
+            <div>
+              <dt>Pasaje</dt>
+              <dd>{ultimoSermon.data.pasaje}</dd>
+            </div>
+            <div>
+              <dt>Predicador</dt>
+              <dd>{ultimoSermon.data.predicador}</dd>
+            </div>
+            {ultimoSermon.data.serie && (
+              <div>
+                <dt>Serie</dt>
+                <dd>{ultimoSermon.data.serie}</dd>
+              </div>
+            )}
+          </dl>
+          <a class="link-arrow" href="/recursos#sermones">
+            Más sermones <Icon name="arrowRight" />
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- PRÓXIMAS ACTIVIDADES -->
+  <section class="section" aria-labelledby="actividades">
+    <div class="container">
+      <div class="split-head">
+        <SectionHead eyebrow="Calendario" title="Próximas actividades" id="actividades" />
+        <a class="btn btn--outline btn--sm" href="/actividades">
+          <Icon name="calendar" /> Ver calendario
+        </a>
+      </div>
+      {proximas.length > 0 ? (
+        <div class="grid grid--3" data-event-list>
+          {proximas.map((e) => (
+            <EventCard event={e} />
+          ))}
+        </div>
+      ) : null}
+      <p class="empty" data-event-empty hidden={proximas.length > 0}>
+        Pronto publicaremos nuevas actividades. Mientras tanto, te esperamos cada domingo a las {culto.hora} hrs.
+      </p>
+    </div>
+  </section>
+
+  <!-- VISÍTANOS -->
+  <section class="section section--cream" aria-labelledby="visita">
+    <div class="container visit">
+      <div class="visit__media">
+        <Image
+          src={fachada}
+          alt="Entrada del templo de la Iglesia Presbiteriana Pacto de Cristo en Maipú."
+          width={720}
+          height={480}
+          class="visit__img"
+        />
+      </div>
+      <div>
+        <p class="eyebrow">¿Primera vez?</p>
+        <h2 id="visita">Nos encantaría recibirte</h2>
+        <ul class="visit__list" role="list">
+          <li>
+            <Icon name="heart" /> Un ambiente cálido y familiar.
+          </li>
+          <li>
+            <Icon name="book" /> Un culto centrado en la Palabra de Dios.
+          </li>
+          <li>
+            <Icon name="users" /> Personas dispuestas a recibirte y responder tus preguntas.
+          </li>
+          <li>
+            <Icon name="sparkle" /> No necesitas saber nada de antemano: solo ven como eres.
+          </li>
+        </ul>
+        <div class="btn-row">
+          <a class="btn" href="/visitanos">
+            Planifica tu visita <Icon name="arrowRight" />
+          </a>
+          <a class="btn btn--outline" href="/visitanos#contacto">
+            Escríbenos
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <HidePastEvents />
+</BaseLayout>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: min(92vh, 820px);
+    color: var(--white);
+    overflow: hidden;
+  }
+  .hero :global(.hero__bg) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(90deg, rgb(14 21 48 / 0.92) 0%, rgb(14 21 48 / 0.78) 45%, rgb(14 21 48 / 0.4) 100%),
+      linear-gradient(0deg, rgb(14 21 48 / 0.7) 0%, transparent 40%);
+  }
+  .hero__content {
+    align-self: center;
+    padding-block: clamp(4rem, 9vw, 7rem) 2.5rem;
+  }
+  .hero__verse {
+    max-width: min(100%, 46rem);
+    margin-bottom: 2.25rem;
+  }
+  .hero__verse p {
+    margin: 0 0 1rem;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: var(--step-4);
+    line-height: 1.18;
+    color: var(--white);
+    text-wrap: balance;
+  }
+  .hero__verse cite {
+    font-style: normal;
+    font-size: var(--step-0);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+  .hero__strip {
+    border-top: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(14 21 48 / 0.55);
+    backdrop-filter: blur(6px);
+  }
+  .hero__strip-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2.5rem;
+    padding-block: 1.1rem;
+  }
+  .hero__strip p {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    font-size: 0.97rem;
+  }
+  .hero__strip :global(svg) {
+    color: var(--gold-400);
+    flex: none;
+  }
+  .hero__strip strong {
+    color: var(--white);
+  }
+
+  /* ---------- Bienvenida ---------- */
+  .welcome {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    grid-template-columns: 1.25fr 1fr;
+    align-items: center;
+  }
+  @media (max-width: 900px) {
+    .welcome {
+      grid-template-columns: 1fr;
+    }
+  }
+  .welcome__title {
+    font-size: var(--step-4);
+  }
+  .identity {
+    position: relative;
+    padding: clamp(1.75rem, 3vw, 2.5rem);
+    padding-top: 4.25rem;
+    margin-top: 3rem;
+    background: var(--cream-100);
+    border-radius: var(--radius-lg);
+  }
+  .identity :global(.identity__emblem) {
+    position: absolute;
+    top: -3.25rem;
+    left: 50%;
+    translate: -50% 0;
+    width: 104px;
+    height: auto;
+    padding: 0.6rem;
+    background: var(--white);
+    border-radius: 50%;
+    box-shadow: var(--shadow-md);
+  }
+  .identity__title {
+    text-align: center;
+    font-size: var(--step-2);
+  }
+  .identity ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.1rem;
+  }
+  .identity li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem;
+  }
+  .identity__check {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--navy-900);
+    color: var(--gold-400);
+  }
+  .identity li div {
+    display: grid;
+    font-size: 0.95rem;
+  }
+  .identity li strong {
+    font-family: var(--font-serif), serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .schedule-cta {
+    margin: 2.25rem 0 0;
+  }
+
+  /* ---------- Oficios ---------- */
+  .offices__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    counter-reset: oficio;
+  }
+  .offices__list li {
+    padding: 2rem;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: var(--radius-lg);
+    background: rgb(255 255 255 / 0.04);
+    text-align: center;
+  }
+  .offices__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.1rem;
+    border-radius: 50%;
+    background: var(--gold-400);
+    color: var(--navy-950);
+  }
+  .offices__list h3 {
+    font-size: var(--step-3);
+    margin-bottom: 0.15rem;
+  }
+  .offices__office {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--blue-300);
+  }
+  .offices__list p:last-child {
+    margin: 0;
+  }
+
+  /* ---------- Sermón ---------- */
+  .sermon {
+    display: grid;
+    gap: clamp(2rem, 4vw, 4rem);
+    grid-template-columns: 1.3fr 1fr;
+    align-items: center;
+  }
+  @media (max-width: 900px) {
+    .sermon {
+      grid-template-columns: 1fr;
+    }
+  }
+  .sermon__meta {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0 0 1.5rem;
+  }
+  .sermon__meta div {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .sermon__meta dt {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+  .sermon__meta dd {
+    margin: 0;
+    font-weight: 600;
+    color: var(--ink-900);
+  }
+
+  /* ---------- Visita ---------- */
+  .visit {
+    display: grid;
+    gap: clamp(2rem, 5vw, 5rem);
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .visit {
+      grid-template-columns: 1fr;
+    }
+  }
+  .visit :global(.visit__img) {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  .visit__list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .visit__list li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: 1.05rem;
+  }
+  .visit__list :global(svg) {
+    flex: none;
+    color: var(--blue-700);
+    margin-top: 0.15em;
+  }
+</style>

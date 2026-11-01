@@ -1,0 +1,12 @@
+# Revisores por área. Hoy el repositorio vive en una cuenta personal, así que hay un único responsable.
+*       @ddiazsanmartin-sudo
+
+# Cuando exista la organización de la iglesia en GitHub, reemplazar la línea anterior por sus equipos
+# (ver docs/ARQUITECTURA.md § Gobernanza):
+#
+# *                                     @ORGANIZACION/equipo-tecnico
+# /src/content/                         @ORGANIZACION/comunicaciones @ORGANIZACION/equipo-tecnico
+# /src/pages/que-creemos.astro          @ORGANIZACION/consistorio
+# /src/pages/quienes-somos.astro        @ORGANIZACION/consistorio
+# /src/pages/culto-y-sacramentos.astro  @ORGANIZACION/consistorio
+# /src/pages/privacidad.astro           @ORGANIZACION/consistorio @ORGANIZACION/equipo-tecnico

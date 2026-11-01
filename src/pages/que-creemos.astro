@@ -1,0 +1,431 @@
+---
+import { Image } from 'astro:assets';
+import bibliaFoto from '@/assets/fotos/biblia-abierta.jpg';
+import bibliaIlus from '@/assets/ilustraciones/biblia-abierta.png';
+import crismon from '@/assets/ilustraciones/crismon.png';
+import westminster from '@/assets/ilustraciones/westminster.png';
+import Icon from '@/components/Icon.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import SubNav from '@/components/SubNav.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { marca } from '@/lib/maqueta';
+
+const escritura = [
+  {
+    titulo: 'Inspiración plenaria y verbal',
+    texto: 'Dios inspiró no solo las ideas, sino las palabras mismas de la Escritura, en todos sus libros.',
+  },
+  { titulo: 'Inerrancia', texto: 'La Escritura, en sus escritos originales, no contiene error alguno.' },
+  {
+    titulo: 'Suficiencia y claridad',
+    texto:
+      'Contiene todo lo necesario para la fe y la vida cristiana, y su mensaje central puede ser comprendido por todo creyente que la lea con fe y humildad.',
+  },
+  { titulo: 'Canon cerrado', texto: 'Los 66 libros del Antiguo y Nuevo Testamento son la revelación completa que Dios nos ha dado.' },
+];
+
+const pactos = [
+  {
+    nombre: 'Pacto de Redención',
+    texto: 'El acuerdo eterno entre las personas de la Trinidad para llevar a cabo la salvación de un pueblo.',
+  },
+  {
+    nombre: 'Pacto de Obras',
+    texto: 'La relación original de Dios con Adán, en la cual la vida fue prometida a cambio de obediencia perfecta.',
+  },
+  {
+    nombre: 'Pacto de Gracia',
+    texto:
+      'La promesa de Dios, después de la caída, de salvar a su pueblo por pura gracia mediante la fe en Cristo: el hilo conductor que une la Escritura de Génesis a Apocalipsis.',
+  },
+];
+
+const gracia = [
+  {
+    nombre: 'Depravación total',
+    texto:
+      'El pecado ha afectado cada parte del ser humano, de modo que, por nosotros mismos, somos incapaces de buscar a Dios o salvarnos.',
+  },
+  {
+    nombre: 'Elección incondicional',
+    texto: 'Dios, por su sola voluntad y misericordia, escogió desde la eternidad a quienes serían salvos, no por mérito alguno en ellos.',
+  },
+  { nombre: 'Redención particular', texto: 'Cristo murió eficazmente para asegurar la salvación de aquellos que el Padre le dio.' },
+  {
+    nombre: 'Llamado eficaz',
+    texto: 'El Espíritu Santo llama y regenera a los elegidos, haciendo que respondan al evangelio con fe genuina.',
+  },
+  {
+    nombre: 'Perseverancia de los santos',
+    texto: 'Aquellos a quienes Dios ha salvado son guardados por su poder y perseverarán en la fe hasta el fin.',
+  },
+];
+
+const confesiones = [
+  { nombre: 'Confesión de Fe de Westminster', texto: 'Fiel resumen sistemático de la doctrina bíblica.' },
+  { nombre: 'Catecismo Mayor de Westminster', texto: 'Exposición amplia de la fe para la enseñanza pública.', inv: true },
+  { nombre: 'Catecismo Menor de Westminster', texto: 'Instrucción esencial para niños y nuevos creyentes.', inv: true },
+  { nombre: 'Otros catecismos y confesiones', texto: 'Documentos históricos de la fe reformada.', inv: true },
+];
+---
+
+<BaseLayout
+  title="Qué creemos"
+  description="Sola Scriptura, teología reformada y pactual, doctrinas de la gracia, Confesión de Fe de Westminster y los credos históricos de la Iglesia."
+>
+  <PageHeader
+    eyebrow="Qué creemos"
+    title="La fe que confesamos"
+    titleInventado
+    leadInventado
+    lead="La Escritura es nuestra única regla infalible de fe y conducta. Con la Iglesia de todos los tiempos, confesamos lo que ella enseña."
+    image={bibliaFoto}
+    alt="Biblia abierta sobre la mesa de la comunión."
+  />
+
+  <SubNav
+    items={[
+      { href: '#escritura', label: 'La Escritura' },
+      { href: '#pacto', label: 'Teología pactual' },
+      { href: '#gracia', label: 'Doctrinas de la gracia' },
+      { href: '#confesiones', label: 'Confesionalidad' },
+      { href: '#catolicidad', label: 'Catolicidad' },
+    ]}
+  />
+
+  <!-- 3.1 Escritura -->
+  <section class="section">
+    <div class="container split">
+      <div>
+        <SectionHead eyebrow="Nuestra autoridad" title="La Escritura" id="escritura">
+          <p class="lead">
+            Creemos que la Biblia, el Antiguo y el Nuevo Testamento, es la Palabra de Dios escrita, y por tanto nuestra autoridad final y
+            suficiente en todo asunto de fe y de vida.
+          </p>
+        </SectionHead>
+        <p class="latin">
+          <span lang="la">Sola Scriptura</span>
+        </p>
+      </div>
+      <Image src={bibliaIlus} alt="Ilustración de una Biblia abierta." width={520} height={389} class="illustration split__img" />
+    </div>
+    <div class="container">
+      <div class="grid grid--4 attributes">
+        {escritura.map((a) => (
+          <article class="card">
+            <Icon name="check" size={22} class="attributes__icon" />
+            <h3>{a.titulo}</h3>
+            <p>{a.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 3.2 Teología pactual -->
+  <section class="section section--navy">
+    <div class="container">
+      <SectionHead eyebrow="Nuestra teología" title="Reformada y pactual" id="pacto" center>
+        <p class="lead">
+          Entendemos toda la Escritura a la luz del pacto que Dios ha establecido con su pueblo. Este pacto se despliega en tres
+          dimensiones:
+        </p>
+      </SectionHead>
+      <ol class="covenants" role="list">
+        {pactos.map((p, i) => (
+          <li class:list={['covenants__item', { 'covenants__item--grace': i === 2 }]}>
+            <span class="covenants__num">{['I', 'II', 'III'][i]}</span>
+            <h3>{p.nombre}</h3>
+            <p>{p.texto}</p>
+          </li>
+        ))}
+      </ol>
+      <blockquote class="covenant-quote">
+        <p>«Yo seré tu Dios y tú serás mi pueblo».</p>
+      </blockquote>
+      <p class="covenant-note">
+        Creemos en la unidad orgánica de toda la Escritura: el Antiguo Testamento no es un libro aparte, sino la preparación del mismo
+        evangelio que se revela plenamente en el Nuevo, con Cristo como centro de todo el pacto redentor — desde la promesa a Abraham,
+        pasando por la ley y los profetas, hasta su cumplimiento en la cruz y la resurrección.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3.3 Doctrinas de la gracia -->
+  <section class="section">
+    <div class="container">
+      <SectionHead eyebrow="Doctrinas de la gracia" title="La salvación es, de principio a fin, obra de Dios" id="gracia" center />
+      <ol class="doctrines" role="list">
+        {gracia.map((d, i) => (
+          <li>
+            <span class="doctrines__num">{i + 1}</span>
+            <div>
+              <h3>{d.nombre}</h3>
+              <p>{d.texto}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 3.4 Confesionalidad -->
+  <section class="section section--cream">
+    <div class="container split split--reverse">
+      <div>
+        <SectionHead eyebrow="Nuestra confesionalidad" title="Testigos fieles de la Escritura" id="confesiones">
+          <p>Como iglesia confesional, recibimos y enseñamos:</p>
+        </SectionHead>
+        <ul class="docs" role="list">
+          {confesiones.map((c) => (
+            <li>
+              <Icon name="scroll" size={22} />
+              <div>
+                <strong>{c.nombre}</strong>
+                <span class={marca('inv' in c)}>{c.texto}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <p class="note">
+          Sostenemos estos documentos no como una autoridad paralela a la Escritura, sino como <strong>testigos fieles de ella</strong>: las
+          confesiones están siempre subordinadas a la Escritura, nuestra única regla infalible de fe y conducta.
+        </p>
+        <a class="link-arrow" href="/recursos#documentos">
+          Ver documentos <Icon name="arrowRight" />
+        </a>
+      </div>
+      <Image
+        src={westminster}
+        alt="Ilustración de la Abadía de Westminster, donde se redactó la Confesión de Fe (1646)."
+        width={300}
+        height={463}
+        class="illustration split__img split__img--small"
+      />
+    </div>
+  </section>
+
+  <!-- 3.5 Catolicidad -->
+  <section class="section">
+    <div class="container split">
+      <div>
+        <SectionHead eyebrow="Nuestra catolicidad" title="Una, santa, católica y apostólica" id="catolicidad" />
+        <p class="lead">
+          Creemos en la Iglesia universal, no limitada a nuestra denominación ni a nuestro tiempo. No somos sectarios: reconocemos como
+          hermanos en la fe a todos los que confiesan a Jesucristo como Señor y Salvador dentro de la ortodoxia cristiana histórica.
+        </p>
+        <p>Confesamos junto con la iglesia de todos los tiempos los credos históricos que expresan las verdades centrales del evangelio:</p>
+        <div class="creeds">
+          <div class="creeds__item">
+            <Icon name="scroll" /> El Credo de los Apóstoles
+          </div>
+          <div class="creeds__item">
+            <Icon name="scroll" /> El Credo Niceno-Constantinopolitano
+          </div>
+        </div>
+      </div>
+      <Image
+        src={crismon}
+        alt="Crismón: las letras griegas Ji y Ro, con Alfa y Omega."
+        width={320}
+        height={410}
+        class="illustration split__img split__img--small"
+      />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .split {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .split--reverse :global(.split__img) {
+    justify-self: center;
+  }
+  @media (max-width: 860px) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+  }
+  .split :global(.split__img) {
+    width: 100%;
+    max-width: 440px;
+    justify-self: center;
+  }
+  .split :global(.split__img--small) {
+    max-width: 260px;
+  }
+  .latin {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: var(--step-3);
+    color: var(--gold-700);
+    margin: 0;
+  }
+  .attributes {
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+  }
+  .attributes :global(.attributes__icon) {
+    color: var(--white);
+    background: var(--blue-700);
+    border-radius: 50%;
+    padding: 4px;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 1rem;
+  }
+  .attributes h3 {
+    font-size: var(--step-1);
+  }
+  .attributes p {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+
+  .covenants {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+  .covenants__item {
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgb(255 255 255 / 0.14);
+    background: rgb(255 255 255 / 0.04);
+  }
+  .covenants__item--grace {
+    background: var(--white);
+    color: var(--ink-700);
+  }
+  .covenants__item--grace h3 {
+    color: var(--navy-900) !important;
+  }
+  .covenants__num {
+    display: block;
+    font-family: var(--font-serif), serif;
+    font-size: 2rem;
+    color: var(--gold-400);
+    margin-bottom: 0.5rem;
+  }
+  .covenants__item--grace .covenants__num {
+    color: var(--gold-700);
+  }
+  .covenants__item p {
+    margin: 0;
+  }
+  .covenant-quote {
+    margin: clamp(2.5rem, 5vw, 4rem) auto 1rem;
+    text-align: center;
+  }
+  .covenant-quote p {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: var(--step-3);
+    color: var(--white);
+    margin: 0;
+  }
+  .covenant-note {
+    max-width: 52rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .doctrines {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 58rem;
+    display: grid;
+    gap: 1rem;
+  }
+  .doctrines li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--cream-50);
+  }
+  .doctrines__num {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--navy-900);
+    color: var(--gold-400);
+    font-family: var(--font-serif), serif;
+    font-size: 1.6rem;
+  }
+  .doctrines h3 {
+    font-size: var(--step-2);
+    margin-bottom: 0.25rem;
+  }
+  .doctrines p {
+    margin: 0;
+  }
+
+  .docs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .docs li {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    background: var(--white);
+    border: 1px solid var(--line);
+  }
+  .docs :global(svg) {
+    flex: none;
+    color: var(--gold-700);
+  }
+  .docs li div {
+    display: grid;
+  }
+  .docs strong {
+    color: var(--navy-900);
+  }
+  .docs span {
+    font-size: 0.93rem;
+  }
+  .note {
+    padding-left: 1rem;
+    border-left: 3px solid var(--gold-500);
+  }
+
+  .creeds {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .creeds__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    background: var(--blue-50);
+    font-family: var(--font-serif), serif;
+    font-size: 1.3rem;
+    color: var(--navy-900);
+  }
+  .creeds__item :global(svg) {
+    color: var(--blue-700);
+    flex: none;
+  }
+</style>

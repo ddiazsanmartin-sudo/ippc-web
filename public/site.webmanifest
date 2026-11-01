@@ -1,0 +1,13 @@
+{
+  "name": "Iglesia Presbiteriana Pacto de Cristo",
+  "short_name": "Pacto de Cristo",
+  "lang": "es-CL",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#162044",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,23 @@
+# build
+dist/
+.astro/
+.wrangler/
+
+# dependencias
+node_modules/
+
+# panel: Sveltia CMS se empaqueta en cada build (scripts/build-admin.mjs)
+public/admin/app/
+
+# secretos
+.env
+.env.*
+!.env.example
+.dev.vars*
+
+# sistema / editores
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json

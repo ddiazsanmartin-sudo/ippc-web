@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+import cordero from '@/assets/marca/cordero.png';
+import Icon from '@/components/Icon.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Inventado from '@/components/Inventado.astro';
+---
+
+<BaseLayout title="Página no encontrada" noindex>
+  <section class="section">
+    <div class="container--narrow not-found">
+      <Image src={cordero} alt="" width={140} height={151} />
+      <p class="eyebrow">Error 404</p>
+      <h1>No encontramos esta página</h1>
+      <p class="lead">
+        <Inventado>«Yo soy el buen pastor; y conozco mis ovejas» (Juan 10:14). Esta página, en cambio, parece haberse perdido.</Inventado>
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="/">
+          <Icon name="arrowRight" /> Volver al inicio
+        </a>
+        <a class="btn btn--outline" href="/visitanos">
+          Visítanos
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    text-align: center;
+    display: grid;
+    justify-items: center;
+  }
+  .not-found .eyebrow {
+    justify-content: center;
+  }
+  .not-found .btn-row {
+    justify-content: center;
+  }
+</style>

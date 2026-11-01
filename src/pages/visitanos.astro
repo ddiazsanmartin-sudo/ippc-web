@@ -1,0 +1,204 @@
+---
+import fachada from '@/assets/fotos/templo-fachada.jpg';
+import ContactForm from '@/components/ContactForm.astro';
+import Icon from '@/components/Icon.astro';
+import MapEmbed from '@/components/MapEmbed.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import ScheduleCards from '@/components/ScheduleCards.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { marca } from '@/lib/maqueta';
+import Inventado from '@/components/Inventado.astro';
+import { getSitio } from '@/lib/content';
+
+const sitio = await getSitio();
+
+const esperar = [
+  { icon: 'heart', titulo: 'Un ambiente cálido', texto: 'Una familia de fe que se alegra de recibirte, seas quien seas.', inv: true },
+  {
+    icon: 'book',
+    titulo: 'Un culto centrado en la Palabra',
+    texto: 'La lectura y la predicación de la Escritura ocupan el centro de nuestra adoración.',
+  },
+  {
+    icon: 'users',
+    titulo: 'Personas dispuestas a ayudarte',
+    texto: 'Habrá hermanos que te recibirán y responderán tus preguntas con gusto.',
+  },
+  { icon: 'sparkle', titulo: 'Ven como eres', texto: 'No necesitas saber nada de antemano. Simplemente acompáñanos.' },
+] as const;
+---
+
+<BaseLayout
+  title="Visítanos"
+  description={`Horarios, dirección (${sitio.direccion.calle}, ${sitio.direccion.comuna}) y contacto de la Iglesia Presbiteriana Pacto de Cristo.`}
+>
+  <PageHeader
+    eyebrow="Visítanos"
+    title="Nos encantaría recibirte"
+    lead={`${sitio.direccion.calle}, ${sitio.direccion.comuna}, ${sitio.direccion.ciudad}.`}
+    image={fachada}
+    alt="Fachada del templo de la iglesia en Maipú."
+  />
+
+  <section class="section">
+    <div class="container">
+      <SectionHead eyebrow="Horarios" title="Cuándo nos reunimos" />
+      <ScheduleCards sitio={sitio} />
+    </div>
+  </section>
+
+  <section class="section section--cream" aria-labelledby="esperar">
+    <div class="container">
+      <SectionHead eyebrow="Tu primera visita" title="Qué esperar" id="esperar" center />
+      <ul class="expect" role="list">
+        {esperar.map((e) => (
+          <li class="card">
+            <span class="expect__icon">
+              <Icon name={e.icon} size={26} />
+            </span>
+            <h3>{e.titulo}</h3>
+            <p class={marca('inv' in e)}>{e.texto}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="como-llegar">
+    <div class="container location">
+      <div>
+        <SectionHead eyebrow="Ubicación" title="Cómo llegar" id="como-llegar" />
+        <address class="address">
+          <Icon name="mapPin" size={26} />
+          <span>
+            <strong>{sitio.direccion.calle}</strong>
+            <br />
+            {sitio.direccion.comuna}, {sitio.direccion.ciudad}
+            <br />
+            {sitio.direccion.region}, Chile
+          </span>
+        </address>
+      </div>
+      <MapEmbed sitio={sitio} />
+    </div>
+  </section>
+
+  <section class="section section--soft" aria-labelledby="contacto">
+    <div class="container contact">
+      <div>
+        <SectionHead eyebrow="Contacto" title="Escríbenos" id="contacto">
+          <p class="lead">
+            <Inventado>
+              ¿Tienes preguntas, una petición de oración o quieres conversar con un pastor? Déjanos tu mensaje y te responderemos.
+            </Inventado>
+          </p>
+        </SectionHead>
+        <ul class="contact__info" role="list">
+          <li>
+            <Icon name="mail" />
+            <a href={`mailto:${sitio.contacto.email}`}>{sitio.contacto.email}</a>
+          </li>
+          {sitio.contacto.telefono && (
+            <li>
+              <Icon name="phone" />
+              <a href={`tel:${sitio.contacto.telefono.replace(/\s/g, '')}`}>{sitio.contacto.telefono}</a>
+            </li>
+          )}
+          <li>
+            <Icon name="shield" />
+            <span>
+              Tus datos se usan solo para responderte y no se guardan en el sitio. <a href="/privacidad">Política de privacidad</a>.
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div class="card contact__form">
+        <ContactForm email={sitio.contacto.email} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .expect {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .expect__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--navy-900);
+    color: var(--gold-400);
+    margin-bottom: 1rem;
+  }
+  .expect h3 {
+    font-size: var(--step-1);
+  }
+  .expect p {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+  .location {
+    display: grid;
+    gap: clamp(2rem, 4vw, 4rem);
+    grid-template-columns: 1fr 1.4fr;
+    align-items: center;
+  }
+  .contact {
+    display: grid;
+    gap: clamp(2rem, 4vw, 4rem);
+    grid-template-columns: 1fr 1.4fr;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .location,
+    .contact {
+      grid-template-columns: 1fr;
+    }
+  }
+  .address {
+    display: flex;
+    gap: 0.9rem;
+    font-style: normal;
+    font-size: 1.15rem;
+    line-height: 1.6;
+  }
+  .address :global(svg) {
+    flex: none;
+    color: var(--gold-700);
+  }
+  .address strong {
+    font-family: var(--font-serif), serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--navy-900);
+  }
+  .contact__info {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .contact__info li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .contact__info :global(svg) {
+    flex: none;
+    color: var(--blue-700);
+    margin-top: 0.15em;
+  }
+  .contact__form {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+  }
+</style>

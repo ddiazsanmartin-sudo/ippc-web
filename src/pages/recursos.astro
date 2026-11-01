@@ -1,0 +1,320 @@
+---
+import { getCollection } from 'astro:content';
+import biblia from '@/assets/fotos/biblia-abierta.jpg';
+import Icon, { type IconName } from '@/components/Icon.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import SermonPlayer from '@/components/SermonPlayer.astro';
+import SubNav from '@/components/SubNav.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { inventado, marca } from '@/lib/maqueta';
+import { formatCalendarDate } from '@/lib/dates';
+import { getSitio } from '@/lib/content';
+
+const sitio = await getSitio();
+const sermones = (await getCollection('sermones')).sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+const [destacado, ...anteriores] = sermones;
+const recursos = (await getCollection('recursos')).sort((a, b) => a.data.orden - b.data.orden);
+const documentos = recursos.filter((r) => r.data.tipo !== 'Libro');
+const libros = recursos.filter((r) => r.data.tipo === 'Libro');
+
+const redes = (
+  [
+    ['youtube', 'YouTube', 'Sermones y cultos grabados', sitio.redes.youtube],
+    ['instagram', 'Instagram', 'Avisos y vida de la congregación', sitio.redes.instagram],
+    ['facebook', 'Facebook', 'Noticias y actividades', sitio.redes.facebook],
+  ] as [IconName, string, string, string | undefined][]
+).filter(([, , , url]) => !!url);
+---
+
+<BaseLayout
+  title="Recursos"
+  description="Sermones, Confesión de Fe y Catecismos de Westminster, artículos y lecturas recomendadas para profundizar en la fe reformada."
+>
+  <PageHeader
+    eyebrow="Recursos"
+    title="Para conocer más de nuestra fe"
+    lead="Sermones, documentos confesionales y lecturas recomendadas para crecer en el conocimiento de Dios."
+    image={biblia}
+    alt="Biblia abierta sobre la mesa de la comunión."
+  />
+
+  <SubNav
+    items={[
+      { href: '#sermones', label: 'Sermones' },
+      { href: '#documentos', label: 'Documentos' },
+      { href: '#lecturas', label: 'Lecturas' },
+      { href: '#redes', label: 'Redes sociales' },
+    ]}
+  />
+
+  {destacado && (
+    <section class="section" aria-labelledby="sermones">
+      <div class="container">
+        <SectionHead eyebrow="Predicación" title="Sermones" id="sermones" />
+        <div class="sermons">
+          <SermonPlayer sermon={destacado} />
+          <ol class="sermon-list" role="list">
+            {anteriores.map((s) => (
+              <li class={marca(inventado.sermones.has(s.id))}>
+                <a href={`https://www.youtube.com/watch?v=${s.data.youtube_id}`} rel="noopener noreferrer" target="_blank">
+                  <span class="sermon-list__play">
+                    <Icon name="play" size={16} />
+                  </span>
+                  <span>
+                    <strong>{s.data.titulo}</strong>
+                    <small>
+                      {s.data.pasaje} · {formatCalendarDate(s.data.fecha)}
+                    </small>
+                  </span>
+                </a>
+              </li>
+            ))}
+            {sitio.redes.youtube && (
+              <li>
+                <a href={sitio.redes.youtube} rel="noopener noreferrer" target="_blank" class="sermon-list__more">
+                  <Icon name="youtube" /> Ver todos en YouTube
+                </a>
+              </li>
+            )}
+          </ol>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section section--cream" aria-labelledby="documentos">
+    <div class="container">
+      <SectionHead eyebrow="Confesión y catecismos" title="Documentos" id="documentos">
+        <p>Las confesiones están siempre subordinadas a la Escritura, la cual es nuestra única regla infalible de fe y conducta.</p>
+      </SectionHead>
+      <ul class="resources" role="list">
+        {documentos.map((r) => (
+          <li class="resource">
+            <span class="resource__type">{r.data.tipo}</span>
+            <h3>{r.data.titulo}</h3>
+            <p class={marca(inventado.recursosDescripcion.has(r.id))}>{r.data.descripcion}</p>
+            {r.data.archivo ? (
+              <a class="btn btn--sm" href={r.data.archivo} download>
+                <Icon name="download" /> Descargar PDF
+              </a>
+            ) : r.data.url ? (
+              <a class="btn btn--sm btn--outline" href={r.data.url} rel="noopener noreferrer" target="_blank">
+                <Icon name="external" /> Abrir
+              </a>
+            ) : (
+              <span class="resource__soon">PDF disponible próximamente</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="lecturas">
+    <div class="container">
+      <SectionHead eyebrow="Para profundizar" title="Lecturas recomendadas" id="lecturas" />
+      <ul class="books" role="list">
+        {libros.map((r) => (
+          <li class={marca(inventado.recursos.has(r.id))}>
+            <Icon name="book" size={28} />
+            <div>
+              <h3>{r.data.titulo}</h3>
+              {r.data.autor && <p class="books__author">{r.data.autor}</p>}
+              <p>{r.data.descripcion}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {redes.length > 0 && (
+    <section class="section section--navy section--tight" aria-labelledby="redes">
+      <div class="container">
+        <SectionHead eyebrow="Síguenos" title="Redes sociales" id="redes" center />
+        <ul class:list={['social', marca(inventado.redes)]} role="list">
+          {redes.map(([icon, nombre, texto, url]) => (
+            <li>
+              <a href={url} rel="noopener noreferrer" target="_blank">
+                <Icon name={icon} size={32} />
+                <strong>{nombre}</strong>
+                <span>{texto}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .sermons {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .sermons {
+      grid-template-columns: 1fr;
+    }
+  }
+  .sermon-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .sermon-list a {
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+    padding: 1rem 1.15rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--cream-50);
+    color: var(--ink-700);
+    text-decoration: none;
+  }
+  .sermon-list a:hover {
+    border-color: var(--blue-300);
+    background: var(--blue-50);
+  }
+  .sermon-list__play {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--navy-900);
+    color: var(--gold-400);
+  }
+  .sermon-list strong {
+    display: block;
+    color: var(--navy-900);
+    font-family: var(--font-serif), serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .sermon-list small {
+    font-size: 0.85rem;
+    color: var(--ink-500);
+  }
+  .sermon-list .sermon-list__more {
+    justify-content: center;
+    font-weight: 700;
+    color: var(--blue-700);
+    background: var(--white);
+  }
+
+  .resources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+  .resource {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.6rem;
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    border-top: 4px solid var(--gold-500);
+    box-shadow: var(--shadow-sm);
+  }
+  .resource__type {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+    margin-bottom: 0.5rem;
+  }
+  .resource h3 {
+    font-size: var(--step-2);
+  }
+  .resource p {
+    font-size: 0.96rem;
+  }
+  .resource > :last-child {
+    margin-top: auto;
+  }
+  .resource__soon {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--ink-500);
+  }
+
+  .books {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  }
+  .books li {
+    display: flex;
+    gap: 1.1rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+  }
+  .books li > :global(svg) {
+    flex: none;
+    color: var(--gold-700);
+  }
+  .books h3 {
+    font-size: var(--step-1);
+    margin-bottom: 0.15rem;
+  }
+  .books__author {
+    font-weight: 600;
+    color: var(--blue-700);
+    margin-bottom: 0.5rem;
+  }
+  .books p:last-child {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .social {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .social a {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    padding: 1.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgb(255 255 255 / 0.16);
+    color: var(--white);
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  .social a:hover {
+    background: rgb(255 255 255 / 0.08);
+    color: var(--white);
+  }
+  .social :global(svg) {
+    color: var(--gold-400);
+  }
+  .social span {
+    font-size: 0.9rem;
+    color: rgb(255 255 255 / 0.7);
+  }
+</style>

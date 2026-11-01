@@ -1,0 +1,25 @@
+# Cabeceras HTTP de seguridad para Cloudflare (Workers Static Assets / Pages).
+# Complementan la CSP por hashes que Astro inserta en cada página (<meta http-equiv>):
+# aquí van las directivas que NO pueden ir en un <meta> (frame-ancestors, upgrade-insecure-requests).
+# Las respuestas de /api/contacto definen sus propias cabeceras en el código.
+
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-site
+  Content-Security-Policy: frame-ancestors 'none'; upgrade-insecure-requests
+
+# Panel de administración (Sveltia CMS): CSP propia y más acotada a lo que el panel necesita.
+# Habla directamente con la API de GitHub; el único servidor propio es el Worker de OAuth.
+# 'wasm-unsafe-eval' solo permite WebAssembly (conversión HEIC/WebP al subir fotos), no eval() de JS.
+/admin/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://avatars.githubusercontent.com https://raw.githubusercontent.com; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' blob: data: https://api.github.com https://www.githubstatus.com https://auth.pactodecristo.cl; frame-src blob:; worker-src 'self' blob:; manifest-src 'self' blob:; form-action 'none'; base-uri 'none'
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8

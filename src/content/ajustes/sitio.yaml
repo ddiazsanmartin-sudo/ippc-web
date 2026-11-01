@@ -1,0 +1,39 @@
+nombre: Iglesia Presbiteriana «Pacto de Cristo»
+nombre_corto: Pacto de Cristo
+lema: El Cordero que está en medio del trono los pastoreará
+descripcion: Iglesia reformada, confesional y presbiteriana en Maipú, Santiago de Chile. Culto público todos los domingos a las 11:00 hrs.
+denominacion:
+  nombre: Iglesia Presbiteriana en América, Chile
+  sigla: IPaCh
+  url: ''
+direccion:
+  calle: Alberto Llona 456
+  comuna: Maipú
+  ciudad: Santiago
+  region: Región Metropolitana
+  lat: -33.5230223
+  lng: -70.7559147
+contacto:
+  email: ip.pactodecristo@gmail.com
+  telefono: ''
+redes:
+  youtube: https://www.youtube.com/
+  instagram: https://www.instagram.com/
+  facebook: https://www.facebook.com/
+horarios:
+  - nombre: Culto Público
+    dia: Domingo
+    hora: '11:00'
+    descripcion: Predicación expositiva, lectura de la Escritura, oración y canto congregacional.
+  - nombre: Culto de Oración
+    dia: Miércoles
+    hora: '20:30'
+    descripcion: Nos reunimos para orar juntos por la iglesia, nuestras familias y la ciudad.
+otros_servicios:
+  - Estudio Bíblico
+  - Escuela Dominical
+  - Pastoral Juvenil
+  - Pastoral de Hombres
+  - Pastoral de Mujeres
+  - Reunión en Casa
+nota_calendario: Según calendario congregacional.

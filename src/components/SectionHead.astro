@@ -1,0 +1,23 @@
+---
+import { marca } from '@/lib/maqueta';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  /** Nivel del título (h2 por defecto). */
+  as?: 'h2' | 'h3';
+  center?: boolean;
+  id?: string;
+  /** MAQUETA: el título fue redactado por el desarrollador (ver src/lib/maqueta.ts). */
+  titleInventado?: boolean;
+}
+const { eyebrow, title, as: Tag = 'h2', center = false, id, titleInventado = false } = Astro.props;
+---
+
+<div class:list={['section-head', { 'section-head--center': center }]}>
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <Tag id={id} class={marca(titleInventado)}>
+    {title}
+  </Tag>
+  <slot />
+</div>

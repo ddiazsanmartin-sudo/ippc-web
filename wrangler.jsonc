@@ -1,0 +1,19 @@
+// Configuración de Cloudflare Workers (sitio estático + 1 función para el formulario de contacto).
+// `main` y el binding de assets los define @astrojs/cloudflare automáticamente.
+//
+// Secretos (NUNCA aquí): `wrangler secret put TURNSTILE_SECRET_KEY` (y RESEND_API_KEY,
+// CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL). La clave pública de Turnstile se incrusta en el build
+// desde la variable de GitHub `PUBLIC_TURNSTILE_SITE_KEY` (ver .github/workflows/deploy.yml).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ippc-web",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Sin URL pública *.workers.dev: durante la revisión se accede por la puerta infra/borrador (con clave);
+  // en producción, por el dominio propio. Evita una segunda dirección pública del mismo sitio.
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+  },
+}

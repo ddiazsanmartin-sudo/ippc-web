@@ -1,0 +1,467 @@
+---
+import { Image } from 'astro:assets';
+import coro from '@/assets/fotos/coro.jpg';
+import fachada from '@/assets/fotos/templo-fachada.jpg';
+import cruzCelta from '@/assets/ilustraciones/cruz-celta.png';
+import estandarte from '@/assets/marca/estandarte.png';
+import Icon from '@/components/Icon.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import SubNav from '@/components/SubNav.astro';
+import Timeline from '@/components/Timeline.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { marca } from '@/lib/maqueta';
+import { getSitio } from '@/lib/content';
+
+const sitio = await getSitio();
+
+const mision = [
+  { icon: 'sparkle', titulo: 'Glorificar a Dios', texto: 'En todo lo que hacemos como iglesia y como creyentes.' },
+  { icon: 'megaphone', titulo: 'Proclamar el Evangelio', texto: 'De Jesucristo a nuestra ciudad y más allá.' },
+  {
+    icon: 'book',
+    titulo: 'Discipular',
+    texto: 'En la sana doctrina, formando seguidores maduros de Cristo que conocen y aman la Palabra de Dios.',
+  },
+  {
+    icon: 'users',
+    titulo: 'Vivir en comunidad pactual',
+    texto: 'Como familia de fe unida por el pacto de gracia, cuidándonos unos a otros en amor.',
+  },
+] as const;
+
+const historia = [
+  {
+    marca: '2009',
+    titulo: 'Plantación en Maipú',
+    texto:
+      'La congregación nace como una plantación bajo el nombre de «Iglesia Reformada de Maipú», y ese mismo año se constituye como Iglesia Particular con su primer Consistorio.',
+  },
+  { marca: '2012', titulo: 'Renovación', texto: 'Renovamos nuestro consistorio y vivimos el traslado del pastor plantador.' },
+  {
+    marca: '2015',
+    titulo: 'Iglesia Misión y refundación',
+    texto:
+      'Tras la desintegración del consistorio, la congregación pasa a ser Iglesia Misión a cargo de su Pastor Titular. Comienza un profundo proceso de refundación y revitalización teológica, litúrgica y ministerial.',
+  },
+  {
+    marca: '—',
+    titulo: 'Nuevos oficiales',
+    texto:
+      'La revitalización avanza hacia la elección y ratificación de presbíteros, y luego de diáconos y asistentes diaconales: la congregación vuelve a constituirse como Iglesia Particular.',
+  },
+  {
+    marca: '2019',
+    titulo: 'Un nuevo nombre',
+    texto:
+      'El 15 de marzo, en asamblea congregacional, los miembros votan adoptar el nombre que llevamos hoy: Iglesia Presbiteriana «Pacto de Cristo».',
+  },
+];
+
+const raices = [
+  {
+    marca: '1520',
+    titulo: 'Martín Lutero',
+    texto:
+      'Buscando ser fiel a la autoridad de la Escritura, se separa de la Iglesia de Roma e inicia un movimiento de renovación que pronto se extiende por toda Europa.',
+  },
+  {
+    marca: 'Ginebra',
+    titulo: 'Juan Calvino',
+    texto:
+      'El pastor francés se convierte en el gran maestro de las Iglesias Reformadas. Su enseñanza, centrada en la autoridad de la Escritura y la soberanía de Dios, forma a generaciones de líderes.',
+  },
+  {
+    marca: '1559',
+    titulo: 'John Knox y Escocia',
+    texto:
+      'Discípulo de Calvino, regresa a Escocia para llevar la Reforma a su nación y da origen a la Iglesia de Escocia: raíz directa de nuestra herencia presbiteriana.',
+  },
+  {
+    marca: 'América',
+    titulo: 'Hasta nosotros',
+    texto:
+      'Presbiterianos escoceses e irlandeses emigran a América, donde el presbiterianismo se convierte en una de las tradiciones más influyentes del continente.',
+  },
+];
+
+const tribunales = [
+  { nombre: 'Sesión', texto: 'El gobierno de ancianos en cada congregación local.' },
+  { nombre: 'Presbiterio', texto: 'La unión regional de congregaciones.' },
+  { nombre: 'Sínodo', texto: 'La reunión de presbiterios.', inv: true },
+  { nombre: 'Asamblea General', texto: 'El cuerpo mayor que reúne a toda la denominación.' },
+];
+---
+
+<BaseLayout
+  title="Quiénes somos"
+  description="Identidad, misión, visión e historia de la Iglesia Presbiteriana Pacto de Cristo en Maipú: una iglesia joven dentro de una tradición muy antigua."
+>
+  <PageHeader
+    eyebrow="Quiénes somos"
+    title="Una iglesia joven en una tradición muy antigua"
+    lead="Reformados, confesionales y presbiterianos: herederos de la fe que la Iglesia ha confesado desde los apóstoles hasta hoy."
+    image={coro}
+    alt="Hermanos de la congregación cantando junto a la mesa de la comunión."
+  />
+
+  <SubNav
+    items={[
+      { href: '#identidad', label: 'Identidad' },
+      { href: '#mision', label: 'Misión y visión' },
+      { href: '#historia', label: 'Historia' },
+      { href: '#raices', label: 'Raíces' },
+      { href: '#gobierno', label: 'Gobierno' },
+    ]}
+  />
+
+  <!-- 2.1 Identidad -->
+  <section class="section">
+    <div class="container two-col">
+      <div class="prose">
+        <SectionHead eyebrow="Nuestra identidad" title="Presbiterianos, reformados y confesionales" id="identidad" />
+        <p class="lead">
+          Somos una <strong>Iglesia Presbiteriana</strong>: gobernada por ancianos, en el orden que la Escritura enseña para el pueblo de
+          Dios
+          <span class="ref">(Hechos 20:17; Tito 1:5-9)</span>.
+        </p>
+        <p>
+          Somos <strong>confesionalmente reformados</strong>: recibimos la Confesión de Fe de Westminster y sus catecismos como fiel resumen
+          de la doctrina bíblica, siempre subordinados a la Escritura misma.
+        </p>
+        <p>
+          Somos miembros de la{' '}
+          <strong>
+            {sitio.denominacion.nombre} ({sitio.denominacion.sigla})
+          </strong>
+          , unidos a otras congregaciones hermanas bajo un mismo gobierno eclesiástico.
+        </p>
+        <p>
+          Y nos reconocemos herederos de la tradición reformada histórica que nace de la Reforma protestante del siglo XVI, con Juan Calvino
+          y los reformadores que le sucedieron, y que llegó a nuestras tierras a través de siglos de fidelidad de la iglesia presbiteriana y
+          reformada en el mundo entero.
+        </p>
+      </div>
+      <figure class="banner-figure">
+        <Image
+          src={estandarte}
+          alt="Estandarte azul con la inscripción «Por el Pacto y la Corona de Cristo»."
+          width={420}
+          height={494}
+          class="illustration"
+        />
+        <figcaption>«Por el Pacto y la Corona de Cristo» — el lema de los presbiterianos escoceses (covenanters).</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2.2 Misión / 2.3 Visión -->
+  <section class="section section--cream">
+    <div class="container">
+      <SectionHead eyebrow="Nuestra misión" title="Para qué existimos" id="mision" center titleInventado />
+      <ol class="mission" role="list">
+        {mision.map((m, i) => (
+          <li class="card">
+            <span class="mission__num">{String(i + 1).padStart(2, '0')}</span>
+            <Icon name={m.icon} size={28} class="mission__icon" />
+            <h3>{m.titulo}</h3>
+            <p>{m.texto}</p>
+          </li>
+        ))}
+      </ol>
+
+      <figure class="vision">
+        <p class="eyebrow">Nuestra visión</p>
+        <blockquote>
+          <p>
+            Aspiramos a ser una iglesia <em>fiel a la Escritura</em> en cada área de su vida y enseñanza; <em>centrada en Cristo</em>, de
+            modo que Él sea el corazón de nuestra predicación, adoración y vida comunitaria; y <em>reformada y siempre reformándose</em>{' '}
+            según la Palabra de Dios.
+          </p>
+        </blockquote>
+        <figcaption>
+          <span lang="la">Ecclesia reformata, semper reformanda secundum verbum Dei</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2.4 Historia -->
+  <section class="section">
+    <div class="container two-col two-col--wide-left">
+      <div>
+        <SectionHead eyebrow="Nuestra historia" title="Dios siempre fiel a su Iglesia" id="historia">
+          <p class="lead">
+            No buscamos importar una visión ajena, sino redescubrir, a la luz de la Escritura, los dones que Dios ya había puesto en la
+            iglesia local.
+          </p>
+        </SectionHead>
+        <Timeline items={historia} />
+        <p class="closing">
+          Seguimos, hasta hoy, en desarrollo: conscientes de que aún no somos todo lo que Dios quiere que seamos, pero agradecidos por su
+          fidelidad, y comprometidos a seguir siendo una iglesia <strong>bíblica, confesional, evangélica y misionera</strong>, basada y
+          empoderada por la presencia del Espíritu Santo.
+        </p>
+      </div>
+      <aside class="sticky-media">
+        <Image src={fachada} alt="Fachada del templo en Alberto Llona 456, Maipú." width={560} height={380} class="rounded" />
+        <div class="card offices-mini">
+          <h3>Un ministerio en tres dimensiones</h3>
+          <ul role="list">
+            <li>
+              <strong>Enseña</strong> — como Cristo, Profeta, enseña a su pueblo.
+            </li>
+            <li>
+              <strong>Ministra</strong> — como Cristo, Sacerdote, ama y sirve a su pueblo.
+            </li>
+            <li>
+              <strong>Pastorea</strong> — como Cristo, Rey, dirige y pastorea a su iglesia.
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 2.5 Raíces -->
+  <section class="section section--navy">
+    <div class="container two-col two-col--wide-left">
+      <div>
+        <SectionHead eyebrow="Nuestras raíces" title="De Ginebra a Escocia, y de allí a América" id="raices">
+          <p class="lead">
+            Nuestra historia como congregación se inserta en una historia mucho más larga: la de la Reforma protestante del siglo XVI.
+          </p>
+        </SectionHead>
+        <Timeline items={raices} dark />
+      </div>
+      <figure class="roots-figure">
+        <Image
+          src={cruzCelta}
+          alt="Cruz celta tallada en madera, símbolo de la herencia escocesa e irlandesa del presbiterianismo."
+          width={320}
+          height={510}
+        />
+        <figcaption>
+          De esa larga cadena de fidelidad heredamos nuestra confesión, nuestro gobierno por ancianos y nuestro compromiso con la Escritura
+          como única autoridad.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 4. Gobierno -->
+  <section class="section section--soft">
+    <div class="container two-col">
+      <div class="prose">
+        <SectionHead eyebrow="Nuestro gobierno" title="Gobernados por ancianos, conectados entre iglesias" id="gobierno" titleInventado />
+        <p>
+          Nuestra iglesia se gobierna bajo el <strong>sistema presbiteriano</strong>, según el patrón del Nuevo Testamento: una pluralidad
+          de ancianos gobierna cada congregación local, en lugar de un solo pastor o líder con autoridad absoluta.
+        </p>
+        <p>
+          Es un gobierno <strong>representativo y conexional</strong>: cada congregación no actúa aislada, sino que está conectada y es
+          responsable ante cuerpos eclesiásticos mayores, conforme al modelo del Concilio de Jerusalén <span class="ref">(Hechos 15)</span>.
+        </p>
+      </div>
+      <div>
+        <p class="courts__label">Tribunales eclesiásticos de la {sitio.denominacion.sigla}</p>
+        <ol class="courts" role="list">
+          {tribunales.map((t, i) => (
+            <li class={`courts__item courts__item--${i}`}>
+              <strong>{t.nombre}</strong>
+              <span class={marca('inv' in t)}>{t.texto}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .two-col {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    grid-template-columns: 1.2fr 1fr;
+    align-items: start;
+  }
+  .two-col--wide-left {
+    grid-template-columns: 1.5fr 1fr;
+  }
+  @media (max-width: 900px) {
+    .two-col,
+    .two-col--wide-left {
+      grid-template-columns: 1fr;
+    }
+  }
+  .banner-figure {
+    margin: 0;
+    text-align: center;
+  }
+  .banner-figure :global(img) {
+    margin-inline: auto;
+    max-width: min(100%, 360px);
+  }
+  figcaption {
+    margin-top: 1rem;
+    font-size: 0.92rem;
+    font-style: italic;
+    color: var(--ink-500);
+  }
+
+  .mission {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+  .mission li {
+    position: relative;
+  }
+  .mission__num {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.5rem;
+    font-family: var(--font-serif), serif;
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--cream-200);
+  }
+  .mission :global(.mission__icon) {
+    color: var(--gold-700);
+    margin-bottom: 1rem;
+  }
+  .mission h3 {
+    font-size: var(--step-1);
+  }
+  .mission p {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+  .vision {
+    max-width: 52rem;
+    margin: clamp(3rem, 6vw, 5rem) auto 0;
+    text-align: center;
+  }
+  .vision .eyebrow {
+    justify-content: center;
+  }
+  .vision blockquote p {
+    font-family: var(--font-serif), serif;
+    font-size: var(--step-2);
+    line-height: 1.4;
+    color: var(--navy-900);
+  }
+  .vision em {
+    color: var(--blue-700);
+  }
+  .vision figcaption {
+    font-size: 1rem;
+    color: var(--gold-700);
+    letter-spacing: 0.04em;
+  }
+
+  .closing {
+    margin-top: 2.5rem;
+    padding: 1.5rem 1.75rem;
+    border-left: 4px solid var(--gold-500);
+    background: var(--cream-50);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .sticky-media {
+    position: sticky;
+    top: calc(var(--header-h) + 5rem);
+    display: grid;
+    gap: 1.25rem;
+  }
+  .sticky-media :global(.rounded) {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  .offices-mini h3 {
+    font-size: var(--step-1);
+  }
+  .offices-mini ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+  }
+  .offices-mini strong {
+    color: var(--navy-900);
+  }
+
+  .roots-figure {
+    margin: 0;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--cream-50);
+    text-align: center;
+  }
+  .roots-figure :global(img) {
+    margin-inline: auto;
+    max-height: 420px;
+    width: auto;
+    mix-blend-mode: multiply;
+  }
+  .roots-figure figcaption {
+    color: var(--ink-700);
+  }
+
+  .courts__label {
+    margin: 0 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+  .courts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .courts__item {
+    display: grid;
+    gap: 0.15rem;
+    padding: 1.1rem 1.4rem;
+    border-radius: var(--radius);
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--blue-300);
+  }
+  .courts__item strong {
+    font-family: var(--font-serif), serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+  .courts__item span {
+    font-size: 0.95rem;
+  }
+  /* La "escalera" visual sugiere los niveles de los tribunales, de lo local a lo general. */
+  .courts__item--1 {
+    margin-left: 1.25rem;
+    border-left-color: var(--blue-600);
+  }
+  .courts__item--2 {
+    margin-left: 2.5rem;
+    border-left-color: var(--blue-700);
+  }
+  .courts__item--3 {
+    margin-left: 3.75rem;
+    border-left-color: var(--navy-900);
+  }
+  @media (max-width: 520px) {
+    .courts__item {
+      margin-left: 0 !important;
+    }
+  }
+</style>

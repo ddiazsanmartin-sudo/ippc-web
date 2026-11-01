@@ -1,0 +1,310 @@
+---
+import { Image } from 'astro:assets';
+import bendicion from '@/assets/fotos/bendicion-final.jpg';
+import culto from '@/assets/fotos/culto-predicacion.jpg';
+import mesa from '@/assets/fotos/mesa-comunion.jpg';
+import pulpitoFoto from '@/assets/fotos/pulpito-santa-cena.jpg';
+import bautisterio from '@/assets/ilustraciones/bautisterio.png';
+import cena from '@/assets/ilustraciones/cena-del-senor.png';
+import pulpito from '@/assets/ilustraciones/pulpito.png';
+import Icon, { type IconName } from '@/components/Icon.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import SubNav from '@/components/SubNav.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { marca } from '@/lib/maqueta';
+import { cultoPrincipal, getSitio } from '@/lib/content';
+
+const sitio = await getSitio();
+const cultoPublico = cultoPrincipal(sitio);
+
+const elementos: { icon: IconName; titulo: string; texto: string; destacado?: boolean }[] = [
+  {
+    icon: 'book',
+    titulo: 'Predicación expositiva',
+    texto: 'La Palabra de Dios, explicada fielmente texto por texto, ocupa el lugar central de nuestro culto.',
+    destacado: true,
+  },
+  { icon: 'scroll', titulo: 'Lectura pública de la Escritura', texto: 'Parte esencial de la adoración congregacional.' },
+  {
+    icon: 'hands',
+    titulo: 'Oración pastoral',
+    texto: 'La congregación es guiada a presentar sus necesidades y acción de gracias delante de Dios.',
+  },
+  { icon: 'music', titulo: 'Canto congregacional', texto: 'Expresamos en voz unida la fe y la gratitud del pueblo de Dios.' },
+  { icon: 'droplet', titulo: 'Sacramentos', texto: 'El bautismo y la Cena del Señor, administrados como Cristo los instituyó.' },
+];
+---
+
+<BaseLayout
+  title="Culto y sacramentos"
+  description="Adoramos a Dios conforme al Principio Regulador del Culto: predicación expositiva, lectura de la Escritura, oración, canto congregacional y sacramentos."
+>
+  <PageHeader
+    eyebrow="Culto y sacramentos"
+    title="Adoramos a Dios como Él lo ha ordenado"
+    lead={`Te esperamos cada ${cultoPublico.dia.toLowerCase()} a las ${cultoPublico.hora} hrs en ${sitio.direccion.calle}, ${sitio.direccion.comuna}.`}
+    image={culto}
+    alt="La congregación reunida escuchando la predicación."
+    position="bottom"
+  />
+
+  <SubNav
+    items={[
+      { href: '#culto', label: 'Nuestro culto' },
+      { href: '#bautismo', label: 'Bautismo' },
+      { href: '#cena', label: 'Cena del Señor' },
+    ]}
+  />
+
+  <!-- 5. Nuestro culto -->
+  <section class="section">
+    <div class="container rpw">
+      <div>
+        <SectionHead eyebrow="Principio Regulador del Culto" title="Nuestro culto" id="culto">
+          <p class="lead">
+            Nuestro culto se organiza conforme al Principio Regulador: adoramos a Dios según lo que Él mismo ha ordenado en su Palabra, no
+            según nuestras propias preferencias o invenciones.
+          </p>
+        </SectionHead>
+      </div>
+      <Image
+        src={pulpito}
+        alt="Ilustración de un púlpito de madera con una cruz celta."
+        width={300}
+        height={330}
+        class="illustration rpw__img"
+      />
+    </div>
+
+    <div class="container">
+      <p class="elements__intro">Nuestro servicio dominical incluye:</p>
+      <ul class="elements" role="list">
+        {elementos.map((e) => (
+          <li class:list={['elements__item', { 'elements__item--main': e.destacado }]}>
+            <span class="elements__icon">
+              <Icon name={e.icon} size={26} />
+            </span>
+            <h3>{e.titulo}</h3>
+            <p>{e.texto}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Banda de fotos -->
+  <section class="photo-band" aria-label="Imágenes del culto">
+    <Image src={pulpitoFoto} alt="El pastor en el púlpito, con el pan y la copa sobre la mesa de la comunión." width={720} height={405} />
+    <Image src={mesa} alt="Pan, copas, jarro y Biblia abierta junto a la cruz celta de la iglesia." width={480} height={720} />
+    <Image src={bendicion} alt="Los oficiales impartiendo la bendición al final del culto." width={480} height={720} />
+  </section>
+
+  <!-- 6. Sacramentos -->
+  <section class="section section--cream">
+    <div class="container">
+      <SectionHead eyebrow="Sacramentos" title="Dos sacramentos instituidos por Cristo" center>
+        <p class={`lead ${marca(true) ?? ''}`}>
+          Medios de gracia mediante los cuales el Señor confirma sus promesas y fortalece la fe de su pueblo.
+        </p>
+      </SectionHead>
+      <div class="sacraments">
+        <article class="sacrament" id="bautismo">
+          <Image src={bautisterio} alt="Ilustración de una pila bautismal." width={220} height={342} class="illustration sacrament__img" />
+          <div>
+            <h3>Bautismo</h3>
+            <p>
+              El bautismo es <strong>señal y sello del pacto de gracia</strong>: representa visiblemente el lavamiento de nuestros pecados y
+              nuestra unión con Cristo en su muerte y resurrección.
+            </p>
+            <p>
+              Es administrado tanto a creyentes adultos que profesan su fe en Cristo como a los hijos de creyentes, quienes son incluidos en
+              el pacto junto a sus padres — así como en el Antiguo Testamento la señal del pacto (la circuncisión) era aplicada a los hijos
+              de la comunidad del pacto.
+            </p>
+          </div>
+        </article>
+        <article class="sacrament" id="cena">
+          <Image src={cena} alt="Ilustración de un cáliz, pan y uvas." width={300} height={260} class="illustration sacrament__img" />
+          <div>
+            <h3>Cena del Señor</h3>
+            <p>
+              En la Cena del Señor celebramos la <strong>presencia real y espiritual de Cristo</strong>, quien se entregó por nosotros. No
+              es un simple memorial vacío, ni creemos que el pan y el vino se transformen físicamente en su cuerpo y sangre.
+            </p>
+            <p>
+              Confesamos que, por la fe y la obra del Espíritu Santo, tenemos verdadera comunión con Cristo al participar de ella. Es un
+              medio de gracia mediante el cual el Señor alimenta y fortalece la fe de su pueblo.
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container cta">
+      <div>
+        <h2>¿Quieres participar de un culto?</h2>
+        <p class="lead">
+          {cultoPublico.nombre}: {cultoPublico.dia.toLowerCase()}s a las {cultoPublico.hora} hrs. No necesitas saber nada de antemano.
+        </p>
+      </div>
+      <a class="btn" href="/visitanos">
+        Planifica tu visita <Icon name="arrowRight" />
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .rpw {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  .rpw :global(.rpw__img) {
+    justify-self: center;
+    width: 100%;
+    max-width: 240px;
+  }
+  @media (max-width: 760px) {
+    .rpw {
+      grid-template-columns: 1fr;
+    }
+    .rpw :global(.rpw__img) {
+      max-width: 160px;
+    }
+  }
+  .elements__intro {
+    font-weight: 600;
+    color: var(--ink-900);
+  }
+  .elements {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .elements__item {
+    padding: 1.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--cream-50);
+  }
+  .elements__item--main {
+    grid-column: span 2;
+    background: var(--navy-900);
+    border-color: var(--navy-900);
+    color: rgb(255 255 255 / 0.85);
+  }
+  .elements__item--main h3 {
+    color: var(--white);
+    font-size: var(--step-3);
+  }
+  @media (max-width: 560px) {
+    .elements__item--main {
+      grid-column: auto;
+    }
+  }
+  .elements__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--blue-700);
+    border: 1px solid var(--line);
+  }
+  .elements__item--main .elements__icon {
+    background: var(--gold-400);
+    color: var(--navy-950);
+    border: 0;
+  }
+  .elements__item h3 {
+    font-size: var(--step-1);
+  }
+  .elements__item p {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+
+  .photo-band {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    /* Fila del alto del contenedor: sin esto la foto crece a su alto natural y se monta sobre lo que sigue. */
+    grid-template-rows: minmax(0, 1fr);
+    height: clamp(16rem, 32vw, 26rem);
+  }
+  .photo-band :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 640px) {
+    .photo-band {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: none;
+    }
+    .photo-band :global(img:first-child) {
+      grid-column: span 2;
+    }
+    .photo-band {
+      height: auto;
+    }
+  }
+
+  .sacraments {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+  }
+  .sacrament {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 1.75rem;
+    align-items: start;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+  }
+  .sacrament :global(.sacrament__img) {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+  }
+  .sacrament h3 {
+    font-size: var(--step-3);
+  }
+  @media (max-width: 520px) {
+    .sacrament {
+      grid-template-columns: 1fr;
+    }
+    .sacrament :global(.sacrament__img) {
+      max-width: 130px;
+    }
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(1.75rem, 4vw, 3rem);
+    border-radius: var(--radius-lg);
+    background: var(--blue-50);
+  }
+  .cta h2 {
+    font-size: var(--step-3);
+  }
+  .cta p {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,128 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { inventado, marca } from '@/lib/maqueta';
+
+interface Props {
+  sitio: CollectionEntry<'sitio'>['data'];
+}
+const { sitio } = Astro.props;
+---
+
+<div class="schedule">
+  {sitio.horarios.map((h, i) => (
+    <article class:list={['schedule__card', { 'schedule__card--main': i === 0 }]}>
+      <p class="schedule__day">
+        <Icon name="calendar" size={18} /> {h.dia}
+      </p>
+      <p class="schedule__time">
+        {h.hora}
+        <span>hrs</span>
+      </p>
+      <h3>{h.nombre}</h3>
+      {h.descripcion && <p class:list={['schedule__desc', marca(inventado.horariosDescripcion.has(i))]}>{h.descripcion}</p>}
+    </article>
+  ))}
+  <article class="schedule__card schedule__card--other">
+    <p class="schedule__day">
+      <Icon name="users" size={18} /> Durante la semana
+    </p>
+    <h3>Otros servicios</h3>
+    <ul role="list">
+      {sitio.otros_servicios.map((s) => (
+        <li>
+          <Icon name="check" size={16} />
+          {s}
+        </li>
+      ))}
+    </ul>
+    {sitio.nota_calendario && <p class="schedule__note">{sitio.nota_calendario}</p>}
+  </article>
+</div>
+
+<style>
+  .schedule {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16.5rem), 1fr));
+  }
+  .schedule__card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+  .schedule__card--main {
+    background: var(--navy-900);
+    border-color: var(--navy-900);
+    color: rgb(255 255 255 / 0.8);
+  }
+  .schedule__card--main h3 {
+    color: var(--white);
+  }
+  .schedule__day {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+  }
+  .schedule__card--main .schedule__day {
+    color: var(--gold-400);
+  }
+  .schedule__time {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-serif), serif;
+    font-size: clamp(2.6rem, 2rem + 2vw, 3.4rem);
+    line-height: 1;
+    color: var(--navy-900);
+  }
+  .schedule__card--main .schedule__time {
+    color: var(--white);
+  }
+  .schedule__time span {
+    font-family: var(--font-sans), sans-serif;
+    font-size: 1rem;
+    margin-left: 0.35rem;
+    opacity: 0.7;
+  }
+  .schedule__card h3 {
+    font-size: var(--step-2);
+    margin-bottom: 0.4rem;
+  }
+  .schedule__desc {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .schedule__card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.25rem 0 0;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.95rem;
+  }
+  .schedule__card li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .schedule__card li :global(svg) {
+    color: var(--blue-700);
+    flex: none;
+  }
+  .schedule__note {
+    margin: auto 0 0;
+    padding-top: 0.9rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--ink-500);
+  }
+</style>

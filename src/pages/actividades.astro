@@ -1,0 +1,111 @@
+---
+import { getCollection } from 'astro:content';
+import ninos from '@/assets/fotos/ninos.jpg';
+import EventCard from '@/components/EventCard.astro';
+import HidePastEvents from '@/components/HidePastEvents.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { formatMonthYear, splitByTime, TIME_ZONE } from '@/lib/dates';
+
+const { upcoming, past } = splitByTime(await getCollection('actividades'));
+
+/** Agrupa por mes (en hora de Chile) para un calendario fácil de recorrer. */
+const monthKey = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE, year: 'numeric', month: '2-digit' }).format(d);
+const groups = [...Map.groupBy(upcoming, (e) => monthKey(e.data.fecha))].map(([key, events]) => ({
+  key,
+  label: formatMonthYear(events[0]?.data.fecha ?? new Date(`${key}-15T12:00:00Z`)),
+  events,
+}));
+
+const eventsJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': upcoming.map((e) => ({
+    '@type': 'Event',
+    name: e.data.titulo,
+    startDate: e.data.fecha.toISOString(),
+    ...(e.data.fecha_fin ? { endDate: e.data.fecha_fin.toISOString() } : {}),
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    eventStatus: 'https://schema.org/EventScheduled',
+    description: e.data.resumen,
+    location: { '@type': 'Place', name: e.data.lugar, '@id': new URL('/#iglesia', Astro.site).href },
+  })),
+};
+---
+
+<BaseLayout
+  title="Actividades"
+  description="Calendario de actividades de la Iglesia Presbiteriana Pacto de Cristo en Maipú."
+  jsonLd={eventsJsonLd}
+>
+  <PageHeader
+    eyebrow="Calendario congregacional"
+    title="Actividades"
+    lead="Cultos especiales, estudios, pastorales y encuentros de la congregación. ¡Todos están invitados!"
+    leadInventado
+    image={ninos}
+    alt="Niños de la iglesia reunidos frente a la congregación."
+  />
+
+  <section class="section">
+    <div class="container--narrow">
+      {groups.map(({ key, label, events }) => (
+        <section class="month" aria-labelledby={`mes-${key}`}>
+          <h2 id={`mes-${key}`} class="month__title">
+            {label}
+          </h2>
+          <div class="month__list" data-event-list>
+            {events.map((e) => (
+              <EventCard event={e} detailed />
+            ))}
+          </div>
+        </section>
+      ))}
+      <p class="empty" data-event-empty hidden={upcoming.length > 0}>
+        No hay actividades próximas publicadas. Te esperamos en nuestros cultos regulares.
+      </p>
+
+      {past.length > 0 && (
+        <details class="past">
+          <summary>Actividades anteriores ({past.length})</summary>
+          <div class="month__list">
+            {past.slice(0, 10).map((e) => (
+              <EventCard event={e} headingLevel="h3" />
+            ))}
+          </div>
+        </details>
+      )}
+    </div>
+  </section>
+
+  <HidePastEvents />
+</BaseLayout>
+
+<style>
+  .month + .month {
+    margin-top: 3rem;
+  }
+  .month__title {
+    font-size: var(--step-3);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--cream-200);
+    margin-bottom: 1.5rem;
+  }
+  .month__list {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .past {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+  .past summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--blue-700);
+    margin-bottom: 1.5rem;
+  }
+  .past :global(.event) {
+    opacity: 0.75;
+  }
+</style>

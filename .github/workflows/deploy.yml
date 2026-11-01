@@ -1,0 +1,61 @@
+# Despliegue a Cloudflare Workers.
+# - En cada push a main (p. ej. cuando el community manager guarda en el panel).
+# - Cada día a las 07:00 UTC (04:00 en horario de verano de Chile, 03:00 en invierno)
+#   para que "Próximas actividades" se actualice sola.
+# - Manualmente desde la pestaña Actions.
+# Si la verificación falla, NO se despliega: el sitio publicado queda como estaba.
+#
+# APAGADO hasta configurar el despliegue: requiere los secretos CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID,
+# las variables PUBLIC_TURNSTILE_SITE_KEY y DEPLOY_ENABLED=true, y los secretos del Worker
+# (TURNSTILE_SECRET_KEY, RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Verificar y publicar
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: https://www.pactodecristo.cl
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Verificación completa (lint, formato, tipos, tests y build)
+        run: npm run verify
+        env:
+          SITE_URL: https://www.pactodecristo.cl
+          # Clave PÚBLICA de Turnstile: se incrusta en el HTML durante el build.
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          # Solo para validar el esquema en build; el Worker lee el valor real desde sus secretos.
+          TURNSTILE_SECRET_KEY: build-placeholder
+
+      - name: Publicar en Cloudflare
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

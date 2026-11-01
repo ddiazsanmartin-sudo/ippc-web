@@ -1,0 +1,25 @@
+aviso:
+  activo: true
+  texto: 'Domingo 1 de noviembre: Culto de Acción de Gracias por la Reforma Protestante'
+  enlace: /actividades
+versiculo:
+  texto: El Cordero que está en medio del trono los pastoreará, y los guiará a fuentes de aguas de vida; y Dios enjugará toda lágrima de los ojos de ellos.
+  referencia: Apocalipsis 7:17
+portada:
+  imagen: portada.jpg
+  alt: La congregación reunida en el culto dominical escuchando la predicación de la Palabra.
+bienvenida:
+  titulo: Bienvenido a la Iglesia Presbiteriana «Pacto de Cristo»
+  texto: |-
+    Somos una congregación reformada y confesional, comprometida con la predicación fiel de la Escritura y con vivir en comunidad bajo el pacto de gracia de Dios.
+
+    Somos miembros de la Iglesia Presbiteriana en América, Chile (IPaCh), en continuidad con la fe histórica que la Iglesia ha confesado desde los apóstoles hasta hoy.
+identidad:
+  - titulo: Reformada
+    texto: Herederos de la Reforma protestante del siglo XVI y de su redescubrimiento del evangelio.
+  - titulo: Confesional
+    texto: Recibimos la Confesión de Fe de Westminster como fiel resumen de la doctrina bíblica.
+  - titulo: Presbiteriana
+    texto: Gobernada por ancianos, en el orden que la Escritura enseña para el pueblo de Dios.
+  - titulo: Miembro de la IPaCh
+    texto: Unidos a congregaciones hermanas bajo un mismo gobierno eclesiástico.

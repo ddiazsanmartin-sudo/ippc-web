@@ -1,0 +1,321 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import { ASUNTOS } from '@/lib/contact/schema';
+import Icon from './Icon.astro';
+
+interface Props {
+  email: string;
+}
+const { email } = Astro.props;
+---
+
+<form class="contact-form" method="post" action="/api/contacto" novalidate data-contact-form>
+  <div class="contact-form__status" role="status" aria-live="polite" data-status></div>
+
+  <div class="contact-form__row">
+    <div class="field">
+      <label for="cf-nombre">
+        Nombre <span aria-hidden="true">*</span>
+      </label>
+      <input
+        id="cf-nombre"
+        name="nombre"
+        type="text"
+        autocomplete="name"
+        required
+        minlength="2"
+        maxlength="80"
+        aria-describedby="cf-nombre-error"
+      />
+      <p class="field__error" id="cf-nombre-error" data-error-for="nombre"></p>
+    </div>
+    <div class="field">
+      <label for="cf-email">
+        Correo electrónico <span aria-hidden="true">*</span>
+      </label>
+      <input id="cf-email" name="email" type="email" autocomplete="email" required maxlength="120" aria-describedby="cf-email-error" />
+      <p class="field__error" id="cf-email-error" data-error-for="email"></p>
+    </div>
+  </div>
+
+  <div class="contact-form__row">
+    <div class="field">
+      <label for="cf-telefono">
+        Teléfono <span class="field__optional">(opcional)</span>
+      </label>
+      <input
+        id="cf-telefono"
+        name="telefono"
+        type="tel"
+        autocomplete="tel"
+        maxlength="20"
+        inputmode="tel"
+        aria-describedby="cf-telefono-error"
+      />
+      <p class="field__error" id="cf-telefono-error" data-error-for="telefono"></p>
+    </div>
+    <div class="field">
+      <label for="cf-asunto">
+        Asunto <span aria-hidden="true">*</span>
+      </label>
+      <select id="cf-asunto" name="asunto" required aria-describedby="cf-asunto-error">
+        {Object.entries(ASUNTOS).map(([value, label]) => (
+          <option value={value}>{label}</option>
+        ))}
+      </select>
+      <p class="field__error" id="cf-asunto-error" data-error-for="asunto"></p>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="cf-mensaje">
+      Mensaje <span aria-hidden="true">*</span>
+    </label>
+    <textarea
+      id="cf-mensaje"
+      name="mensaje"
+      rows="6"
+      required
+      minlength="10"
+      maxlength="2000"
+      aria-describedby="cf-mensaje-error"
+    ></textarea>
+    <p class="field__error" id="cf-mensaje-error" data-error-for="mensaje"></p>
+  </div>
+
+  <!-- Trampa para bots: invisible para personas y lectores de pantalla. -->
+  <div class="hp" aria-hidden="true">
+    <label for="cf-sitio">No completar este campo</label>
+    <input id="cf-sitio" name="sitio_web" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="field field--check">
+    <input id="cf-consentimiento" name="consentimiento" type="checkbox" required aria-describedby="cf-consentimiento-error" />
+    <label for="cf-consentimiento">
+      Acepto que la iglesia use estos datos solo para responder mi mensaje, según la
+      <a href="/privacidad">política de privacidad</a>.
+    </label>
+    <p class="field__error" id="cf-consentimiento-error" data-error-for="consentimiento"></p>
+  </div>
+
+  <div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-action="contacto" data-language="es" data-theme="light"></div>
+
+  <button class="btn" type="submit" data-submit>
+    <Icon name="mail" /> Enviar mensaje
+  </button>
+
+  <noscript>
+    <p class="contact-form__noscript">
+      Para enviar el formulario necesitas activar JavaScript (lo usamos para filtrar spam). También puedes escribirnos directamente a{' '}
+      <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+  </noscript>
+</form>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
+
+<script>
+  type Result = { ok: boolean; error?: string; fieldErrors?: Record<string, string> };
+  type TurnstileApi = { reset: (el?: Element) => void };
+
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const status = form?.querySelector<HTMLElement>('[data-status]');
+  const submit = form?.querySelector<HTMLButtonElement>('[data-submit]');
+  if (form && status && submit) {
+    // Cronómetro monotónico: independiente del reloj del equipo (ver MIN_FILL_TIME_MS en el servidor).
+    let shownAt = performance.now();
+
+    const setStatus = (kind: 'ok' | 'error' | 'info', text: string) => {
+      status.replaceChildren();
+      const p = document.createElement('p');
+      p.className = kind;
+      p.textContent = text; // nunca innerHTML con datos de red
+      status.append(p);
+    };
+
+    const clearErrors = () => {
+      for (const el of form.querySelectorAll<HTMLElement>('[data-error-for]')) el.textContent = '';
+      for (const el of form.querySelectorAll('[aria-invalid]')) el.removeAttribute('aria-invalid');
+    };
+
+    const showErrors = (errors: Record<string, string>) => {
+      let first: HTMLElement | null = null;
+      for (const [field, message] of Object.entries(errors)) {
+        const slot = form.querySelector<HTMLElement>(`[data-error-for="${CSS.escape(field)}"]`);
+        const input = form.querySelector<HTMLElement>(`[name="${CSS.escape(field)}"]`);
+        if (slot) slot.textContent = message;
+        if (input) {
+          input.setAttribute('aria-invalid', 'true');
+          first ??= input;
+        }
+      }
+      first?.focus();
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearErrors();
+
+      const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+      const payload = {
+        nombre: data.nombre ?? '',
+        email: data.email ?? '',
+        telefono: data.telefono || undefined,
+        asunto: data.asunto ?? '',
+        mensaje: data.mensaje ?? '',
+        consentimiento: data.consentimiento === 'on',
+        sitio_web: data.sitio_web ?? '',
+        transcurrido: Math.round(performance.now() - shownAt),
+        turnstileToken: data['cf-turnstile-response'] ?? '',
+      };
+      if (!payload.turnstileToken) {
+        setStatus('error', 'Espera un momento a que termine la verificación anti-spam e inténtalo de nuevo.');
+        return;
+      }
+
+      submit.disabled = true;
+      setStatus('info', 'Enviando…');
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const isJson = res.headers.get('content-type')?.includes('application/json');
+        const result: Result = isJson
+          ? ((await res.json()) as Result)
+          : { ok: false, error: `No pudimos enviar tu mensaje (error ${res.status}). Escríbenos directamente por correo.` };
+        if (result.ok) {
+          form.reset();
+          shownAt = performance.now();
+          setStatus('ok', '¡Gracias! Recibimos tu mensaje y te responderemos pronto.');
+        } else {
+          setStatus('error', result.error ?? 'No pudimos enviar tu mensaje.');
+          if (result.fieldErrors) showErrors(result.fieldErrors);
+        }
+      } catch {
+        setStatus('error', 'Hubo un problema de conexión. Inténtalo nuevamente en unos minutos.');
+      } finally {
+        submit.disabled = false;
+        (window as unknown as { turnstile?: TurnstileApi }).turnstile?.reset(form.querySelector('.cf-turnstile') ?? undefined);
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-form {
+    display: grid;
+    gap: 1.15rem;
+  }
+  .contact-form__row {
+    display: grid;
+    gap: 1.15rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+  .field {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .field label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink-900);
+  }
+  .field__optional {
+    font-weight: 400;
+    color: var(--ink-500);
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid #cfc6b4;
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    font: inherit;
+    color: var(--ink-900);
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 9rem;
+  }
+  .field :is(input, select, textarea):focus {
+    outline: none;
+    border-color: var(--blue-700);
+    box-shadow: 0 0 0 4px var(--blue-100);
+  }
+  .field [aria-invalid='true'] {
+    border-color: #b3261e;
+  }
+  .field__error {
+    margin: 0;
+    min-height: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #b3261e;
+  }
+  .field__error:empty {
+    display: none;
+  }
+  .field--check {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    column-gap: 0.75rem;
+  }
+  .field--check input {
+    width: 22px;
+    height: 22px;
+    min-height: 0;
+    margin-top: 0.15rem;
+    accent-color: var(--blue-700);
+  }
+  .field--check label {
+    font-weight: 400;
+  }
+  .field--check .field__error {
+    grid-column: 2;
+  }
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .contact-form__status p {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+  }
+  .contact-form__status :global(.ok) {
+    background: #e7f4ea;
+    color: #1d5b2c;
+  }
+  .contact-form__status :global(.error) {
+    background: #fbeaea;
+    color: #8c1d18;
+  }
+  .contact-form__status :global(.info) {
+    background: var(--blue-50);
+    color: var(--blue-700);
+  }
+  .contact-form button {
+    justify-self: start;
+  }
+  .contact-form button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .contact-form__noscript {
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--cream-100);
+  }
+</style>

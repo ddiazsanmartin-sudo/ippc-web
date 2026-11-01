@@ -1,0 +1,19 @@
+---
+/**
+ * El sitio es estático y se reconstruye a diario (ver .github/workflows/deploy.yml).
+ * Entre builds, este pequeño script oculta en el navegador las actividades que ya terminaron.
+ */
+---
+
+<script>
+  const now = Date.now();
+  for (const el of document.querySelectorAll<HTMLElement>('[data-event][data-ends]')) {
+    const ends = Date.parse(el.dataset.ends ?? '');
+    if (Number.isFinite(ends) && ends < now) el.hidden = true;
+  }
+  for (const list of document.querySelectorAll<HTMLElement>('[data-event-list]')) {
+    const anyVisible = [...list.querySelectorAll<HTMLElement>('[data-event]')].some((e) => !e.hidden);
+    const empty = list.parentElement?.querySelector<HTMLElement>('[data-event-empty]');
+    if (!anyVisible && empty) empty.hidden = false;
+  }
+</script>

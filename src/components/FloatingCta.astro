@@ -1,0 +1,59 @@
+---
+import Icon from './Icon.astro';
+---
+
+<a href="/visitanos" class="floating-cta">
+  <Icon name="church" size={22} />
+  <span>¿Primera visita?</span>
+</a>
+
+<style>
+  /* Inspirado en el botón persistente "¿Preguntas sobre la Iglesia?" de veniracristo.org */
+  .floating-cta {
+    position: fixed;
+    right: clamp(1rem, 2.5vw, 2rem);
+    bottom: clamp(1rem, 2.5vw, 2rem);
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 54px;
+    padding: 0.75rem 1.35rem 0.75rem 1.1rem;
+    border-radius: var(--radius-pill);
+    background: var(--blue-700);
+    color: var(--white);
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow:
+      0 10px 30px rgb(14 21 48 / 0.28),
+      0 0 0 4px rgb(255 255 255 / 0.9);
+    transition:
+      transform 0.25s var(--ease),
+      background-color 0.2s var(--ease);
+  }
+  .floating-cta:hover {
+    color: var(--white);
+    background: var(--blue-600);
+    transform: translateY(-2px);
+  }
+  .floating-cta :global(svg) {
+    color: var(--gold-400);
+  }
+  @media (max-width: 520px) {
+    .floating-cta {
+      padding: 0.75rem;
+      min-width: 54px;
+      justify-content: center;
+    }
+    .floating-cta span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+  :global(.menu-open) .floating-cta {
+    display: none;
+  }
+</style>

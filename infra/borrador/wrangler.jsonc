@@ -1,0 +1,11 @@
+// Puerta del borrador: única URL pública mientras se revisa la maqueta.
+// Secretos (nunca aquí): `wrangler secret put BORRADOR_USUARIO` y `wrangler secret put BORRADOR_CLAVE`.
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "ippc-borrador",
+  "main": "index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "services": [{ "binding": "SITIO", "service": "ippc-web" }],
+}

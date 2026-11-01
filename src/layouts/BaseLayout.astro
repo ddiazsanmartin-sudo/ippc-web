@@ -1,0 +1,80 @@
+---
+import { Font } from 'astro:assets';
+import '@/styles/global.css';
+import AnnouncementBar from '@/components/AnnouncementBar.astro';
+import FloatingCta from '@/components/FloatingCta.astro';
+import Footer from '@/components/Footer.astro';
+import Header from '@/components/Header.astro';
+import MaquetaToggle from '@/components/MaquetaToggle.astro';
+import { churchJsonLd, serializeJsonLd } from '@/lib/json-ld';
+import { getInicio, getSitio } from '@/lib/content';
+import { MARCAR_INVENTADO } from '@/lib/maqueta';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Imagen para redes sociales (ruta pública absoluta). */
+  ogImage?: string;
+  /** Datos estructurados adicionales de la página (schema.org). */
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+}
+
+const sitio = await getSitio();
+const inicio = await getInicio();
+const { title, description = sitio.descripcion, ogImage = '/og-image.jpg', jsonLd, noindex = false } = Astro.props;
+
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const fullTitle =
+  Astro.url.pathname === '/' ? `${sitio.nombre_corto} · Iglesia Presbiteriana en Maipú` : `${title} · ${sitio.nombre_corto}`;
+const structured = [churchJsonLd(sitio, siteUrl), ...(jsonLd ? [jsonLd] : [])];
+---
+
+<!doctype html>
+<html lang="es-CL" class={MARCAR_INVENTADO ? 'marcas' : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#162044" />
+    <meta name="color-scheme" content="light" />
+
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:site_name" content={sitio.nombre} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, siteUrl).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <Font cssVariable="--font-serif" preload />
+    <Font cssVariable="--font-sans" preload />
+
+    <script type="application/ld+json" set:html={serializeJsonLd(structured)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">
+      Saltar al contenido
+    </a>
+    {inicio.aviso.activo && inicio.aviso.texto && <AnnouncementBar texto={inicio.aviso.texto} enlace={inicio.aviso.enlace} />}
+    <Header />
+    <main id="contenido" tabindex="-1">
+      <slot />
+    </main>
+    <Footer sitio={sitio} />
+    {Astro.url.pathname !== '/visitanos' && <FloatingCta />}
+    {MARCAR_INVENTADO && <MaquetaToggle />}
+  </body>
+</html>

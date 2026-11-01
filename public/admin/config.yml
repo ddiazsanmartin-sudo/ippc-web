@@ -1,0 +1,331 @@
+# Panel de administración — Sveltia CMS (https://sveltiacms.app)
+#
+# - Cada cambio guardado aquí es un commit en GitHub → CI valida → se publica solo.
+# - Los nombres de campos y límites DEBEN coincidir con src/content.config.ts:
+#   si algo no cuadra, el build falla y el sitio publicado no cambia.
+# - Los textos doctrinales (Qué creemos, Quiénes somos…) NO se editan aquí a propósito:
+#   se modifican vía Pull Request con revisión (ver docs/ARQUITECTURA.md § Gobernanza).
+
+backend:
+  name: github
+  repo: ddiazsanmartin-sudo/ippc-web
+  branch: main
+  base_url: https://auth.pactodecristo.cl # Worker OAuth (sveltia-cms-auth) — TODO al desplegar
+  # Solo OAuth de GitHub (con 2FA obligatoria en la organización). Se desactiva el ingreso con
+  # tokens personales: son de larga duración y fáciles de filtrar por un usuario no técnico.
+  auth_methods: [oauth]
+  commit_messages:
+    create: 'contenido({{collection}}): crear «{{slug}}»'
+    update: 'contenido({{collection}}): actualizar «{{slug}}»'
+    delete: 'contenido({{collection}}): eliminar «{{slug}}»'
+    uploadMedia: 'medios: subir «{{path}}»'
+    deleteMedia: 'medios: eliminar «{{path}}»'
+
+app_title: Panel · Pacto de Cristo
+logo:
+  src: /admin/logo.png
+site_url: https://www.pactodecristo.cl
+
+# Carpeta por defecto para archivos sueltos. Las fotos de actividades y ministerios se guardan
+# junto a cada entrada (media_folder: '') para que Astro las optimice (AVIF/WebP) en el build.
+media_folder: public/uploads
+public_folder: /uploads
+
+# Optimización en el navegador ANTES de subir: las fotos de celular (3–8 MB, incluso HEIC de iPhone)
+# se convierten a WebP de máx. 2400 px. Mantiene el repositorio liviano; Astro genera luego AVIF/WebP finales.
+media_libraries:
+  all:
+    max_file_size: 20000000
+    transformations:
+      raster_image:
+        format: webp
+        quality: 85
+        width: 2400
+        height: 2400
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+editor:
+  preview: false
+
+output:
+  omit_empty_optional_fields: true
+
+singletons:
+  - name: inicio
+    label: Página de inicio
+    icon: home
+    file: src/content/ajustes/inicio.yaml
+    fields:
+      - name: aviso
+        label: Aviso destacado (barra superior)
+        widget: object
+        fields:
+          - { name: activo, label: Mostrar aviso, widget: boolean, default: false }
+          - { name: texto, label: Texto del aviso, widget: string, required: false, maxlength: 140 }
+          - name: enlace
+            label: Enlace (opcional)
+            widget: string
+            required: false
+            hint: 'Una página del sitio (ej. /actividades) o una dirección que empiece con https://'
+            pattern: ['^(https://.+|/[A-Za-z0-9_#/-]*)?$', 'Debe empezar con / o con https://']
+      - name: versiculo
+        label: Versículo de portada
+        widget: object
+        fields:
+          - { name: texto, label: Texto, widget: text, maxlength: 320 }
+          - { name: referencia, label: Referencia, widget: string, maxlength: 60, hint: 'Ej. Apocalipsis 7:17' }
+      - name: portada
+        label: Foto de portada
+        widget: object
+        fields:
+          - {
+              name: imagen,
+              label: Imagen,
+              widget: image,
+              media_folder: '',
+              public_folder: '',
+              accept: 'image/jpeg,image/png,image/webp,image/heic,image/avif',
+              hint: 'Horizontal, idealmente 1600 px de ancho o más',
+            }
+          - {
+              name: alt,
+              label: Descripción de la imagen,
+              widget: string,
+              maxlength: 200,
+              hint: 'Qué se ve en la foto (para personas ciegas y buscadores)',
+            }
+      - name: bienvenida
+        label: Texto de bienvenida
+        widget: object
+        fields:
+          - { name: titulo, label: Título, widget: string, maxlength: 120 }
+          - { name: texto, label: Texto, widget: text, maxlength: 1200, hint: 'Deja una línea en blanco para separar párrafos' }
+      - name: identidad
+        label: Identidad (resumen)
+        widget: list
+        min: 1
+        max: 6
+        summary: '{{fields.titulo}}'
+        fields:
+          - { name: titulo, label: Título, widget: string, maxlength: 40 }
+          - { name: texto, label: Texto, widget: string, maxlength: 140 }
+
+  - name: sitio
+    label: Datos generales y horarios
+    icon: settings
+    file: src/content/ajustes/sitio.yaml
+    fields:
+      - { name: nombre, label: Nombre de la iglesia, widget: string, maxlength: 120 }
+      - { name: nombre_corto, label: Nombre corto, widget: string, maxlength: 40 }
+      - { name: lema, label: Lema, widget: string, maxlength: 120 }
+      - {
+          name: descripcion,
+          label: Descripción para buscadores,
+          widget: text,
+          maxlength: 170,
+          hint: 'Aparece en Google bajo el título del sitio',
+        }
+      - name: denominacion
+        label: Denominación
+        widget: object
+        collapsed: true
+        fields:
+          - { name: nombre, label: Nombre, widget: string, maxlength: 120 }
+          - { name: sigla, label: Sigla, widget: string, maxlength: 12 }
+          - { name: url, label: Sitio web, widget: string, required: false, pattern: ['^(https://.+)?$', 'Debe empezar con https://'] }
+      - name: direccion
+        label: Dirección
+        widget: object
+        collapsed: true
+        fields:
+          - { name: calle, label: Calle y número, widget: string, maxlength: 120 }
+          - { name: comuna, label: Comuna, widget: string, maxlength: 60 }
+          - { name: ciudad, label: Ciudad, widget: string, maxlength: 60 }
+          - { name: region, label: Región, widget: string, maxlength: 80 }
+          - {
+              name: lat,
+              label: Latitud,
+              widget: number,
+              value_type: float,
+              hint: 'Para el mapa. En Google Maps: clic derecho sobre el templo → copiar coordenadas',
+            }
+          - { name: lng, label: Longitud, widget: number, value_type: float }
+      - name: contacto
+        label: Contacto
+        widget: object
+        fields:
+          - { name: email, label: Correo, widget: string, pattern: ['^[^@\s]+@[^@\s]+\.[^@\s]+$', 'Correo inválido'] }
+          - { name: telefono, label: Teléfono, widget: string, required: false, maxlength: 20 }
+      - name: redes
+        label: Redes sociales
+        widget: object
+        fields:
+          - { name: youtube, label: YouTube, widget: string, required: false, pattern: ['^(https://.+)?$', 'Debe empezar con https://'] }
+          - {
+              name: instagram,
+              label: Instagram,
+              widget: string,
+              required: false,
+              pattern: ['^(https://.+)?$', 'Debe empezar con https://'],
+            }
+          - { name: facebook, label: Facebook, widget: string, required: false, pattern: ['^(https://.+)?$', 'Debe empezar con https://'] }
+      - name: horarios
+        label: Horarios de culto
+        widget: list
+        min: 1
+        summary: '{{fields.nombre}} — {{fields.dia}} {{fields.hora}}'
+        fields:
+          - { name: nombre, label: Nombre, widget: string, maxlength: 60 }
+          - { name: dia, label: Día, widget: select, options: [Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo] }
+          - { name: hora, label: Hora (24 h), widget: string, pattern: ['^([01][0-9]|2[0-3]):[0-5][0-9]$', 'Formato HH:MM, ej. 11:00'] }
+          - { name: descripcion, label: Descripción, widget: string, required: false, maxlength: 200 }
+      - {
+          name: otros_servicios,
+          label: Otros servicios,
+          widget: list,
+          field: { name: servicio, label: Servicio, widget: string, maxlength: 60 },
+        }
+      - { name: nota_calendario, label: Nota, widget: string, required: false, maxlength: 200 }
+
+collections:
+  - name: actividades
+    label: Actividades
+    label_singular: Actividad
+    description: Calendario congregacional. Las actividades pasadas se ocultan automáticamente del sitio.
+    icon: event
+    folder: src/content/actividades
+    path: '{{slug}}/index'
+    extension: yaml
+    format: yaml
+    media_folder: ''
+    public_folder: ''
+    create: true
+    slug: '{{year}}-{{month}}-{{titulo}}'
+    summary: "{{titulo}} — {{fecha | date('DD/MM/YYYY HH:mm')}}"
+    sortable_fields:
+      fields: [fecha, titulo]
+      default: { field: fecha, direction: descending }
+    fields:
+      - { name: titulo, label: Título, widget: string, maxlength: 100 }
+      - { name: fecha, label: Inicio, widget: datetime, format: 'YYYY-MM-DDTHH:mm:ssZ', date_format: 'DD/MM/YYYY', time_format: 'HH:mm' }
+      - {
+          name: fecha_fin,
+          label: Término (opcional),
+          widget: datetime,
+          required: false,
+          format: 'YYYY-MM-DDTHH:mm:ssZ',
+          date_format: 'DD/MM/YYYY',
+          time_format: 'HH:mm',
+        }
+      - { name: categoria, label: Categoría, widget: select, options: [Culto, Estudio, Pastoral, Evangelismo, Especial] }
+      - { name: lugar, label: Lugar, widget: string, maxlength: 120, default: 'Templo — Alberto Llona 456, Maipú' }
+      - { name: resumen, label: Resumen, widget: text, maxlength: 220, hint: 'Una o dos frases. Aparece en la portada.' }
+      - { name: descripcion, label: Descripción completa (opcional), widget: text, required: false, maxlength: 2000 }
+      - {
+          name: imagen,
+          label: Imagen (opcional),
+          widget: image,
+          required: false,
+          accept: 'image/jpeg,image/png,image/webp,image/heic,image/avif',
+        }
+      - {
+          name: imagen_alt,
+          label: Descripción de la imagen,
+          widget: string,
+          required: false,
+          maxlength: 200,
+          hint: 'Obligatoria si subes una imagen',
+        }
+      - { name: publicado, label: Publicado, widget: boolean, default: true, hint: 'Desmárcalo para guardar como borrador sin mostrarlo' }
+
+  - name: sermones
+    label: Sermones
+    label_singular: Sermón
+    description: Cada sermón enlaza a su video en YouTube. El más reciente aparece en la portada.
+    icon: play_circle
+    folder: src/content/sermones
+    extension: yaml
+    format: yaml
+    create: true
+    slug: '{{year}}-{{month}}-{{day}}-{{titulo}}'
+    summary: "{{fecha | date('DD/MM/YYYY')}} — {{titulo}} ({{pasaje}})"
+    sortable_fields:
+      fields: [fecha, titulo]
+      default: { field: fecha, direction: descending }
+    fields:
+      - { name: titulo, label: Título, widget: string, maxlength: 120 }
+      - { name: fecha, label: Fecha, widget: datetime, time_format: false, format: 'YYYY-MM-DD', date_format: 'DD/MM/YYYY' }
+      - { name: predicador, label: Predicador, widget: string, maxlength: 80 }
+      - { name: pasaje, label: Pasaje bíblico, widget: string, maxlength: 60, hint: 'Ej. Romanos 8:28-39' }
+      - { name: serie, label: Serie (opcional), widget: string, required: false, maxlength: 80 }
+      - name: youtube_id
+        label: Código del video de YouTube
+        widget: string
+        pattern: ['^[A-Za-z0-9_-]{11}$', 'Son 11 caracteres: lo que va después de «watch?v=» en el enlace']
+        hint: 'En https://www.youtube.com/watch?v=AbCdEfGhIjK el código es AbCdEfGhIjK'
+      - { name: resumen, label: Resumen (opcional), widget: text, required: false, maxlength: 400 }
+
+  - name: ministerios
+    label: Ministerios y pastorales
+    label_singular: Ministerio
+    description: Tarjetas de la página «Vida de iglesia».
+    icon: groups
+    folder: src/content/ministerios
+    path: '{{slug}}/index'
+    extension: yaml
+    format: yaml
+    media_folder: ''
+    public_folder: ''
+    create: true
+    slug: '{{nombre}}'
+    summary: '{{orden}}. {{nombre}}'
+    sortable_fields:
+      fields: [orden, nombre]
+      default: { field: orden, direction: ascending }
+    fields:
+      - { name: nombre, label: Nombre, widget: string, maxlength: 60 }
+      - { name: orden, label: Orden, widget: number, value_type: int, min: 0, max: 99, default: 10 }
+      - { name: resumen, label: Descripción breve, widget: text, maxlength: 220 }
+      - { name: horario, label: Horario (opcional), widget: string, required: false, maxlength: 80 }
+      - { name: imagen, label: Foto, widget: image, accept: 'image/jpeg,image/png,image/webp,image/heic,image/avif' }
+      - { name: imagen_alt, label: Descripción de la foto, widget: string, maxlength: 200 }
+
+  - name: recursos
+    label: Recursos y lecturas
+    label_singular: Recurso
+    description: Documentos (PDF), enlaces y libros recomendados de la página «Recursos».
+    icon: menu_book
+    folder: src/content/recursos
+    extension: yaml
+    format: yaml
+    create: true
+    slug: '{{titulo}}'
+    summary: '{{tipo}} — {{titulo}}'
+    sortable_fields:
+      fields: [orden, titulo]
+      default: { field: orden, direction: ascending }
+    fields:
+      - { name: titulo, label: Título, widget: string, maxlength: 120 }
+      - { name: tipo, label: Tipo, widget: select, options: [Confesión, Catecismo, Artículo, Libro, Enlace] }
+      - { name: autor, label: Autor (opcional), widget: string, required: false, maxlength: 80 }
+      - { name: descripcion, label: Descripción, widget: text, maxlength: 300 }
+      - {
+          name: url,
+          label: Enlace externo (opcional),
+          widget: string,
+          required: false,
+          pattern: ['^(https://.+)?$', 'Debe empezar con https://'],
+        }
+      - {
+          name: archivo,
+          label: Archivo PDF (opcional),
+          widget: file,
+          required: false,
+          media_folder: /public/documentos,
+          public_folder: /documentos,
+          accept: application/pdf,
+        }
+      - { name: orden, label: Orden, widget: number, value_type: int, min: 0, max: 99, default: 10 }

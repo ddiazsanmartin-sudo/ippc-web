@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+
+interface Props {
+  sitio: CollectionEntry<'sitio'>['data'];
+}
+const { sitio } = Astro.props;
+const { lat, lng, calle, comuna, ciudad } = sitio.direccion;
+const d = 0.006;
+const bbox = [lng - d, lat - d * 0.6, lng + d, lat + d * 0.6].map((n) => n.toFixed(6)).join(',');
+const osm = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+const query = encodeURIComponent(`${calle}, ${comuna}, ${ciudad}, Chile`);
+const google = `https://www.google.com/maps/search/?api=1&query=${query}`;
+const waze = `https://waze.com/ul?q=${query}&navigate=yes`;
+---
+
+<div class="map">
+  <iframe
+    class="map__frame"
+    src={osm}
+    title={`Mapa: ${calle}, ${comuna}`}
+    loading="lazy"
+    referrerpolicy="strict-origin-when-cross-origin"
+    sandbox="allow-scripts allow-same-origin"
+  ></iframe>
+  <div class="map__actions">
+    <a class="btn btn--sm" href={google} rel="noopener noreferrer" target="_blank">
+      <Icon name="mapPin" /> Abrir en Google Maps
+    </a>
+    <a class="btn btn--sm btn--outline" href={waze} rel="noopener noreferrer" target="_blank">
+      <Icon name="external" /> Abrir en Waze
+    </a>
+  </div>
+</div>
+
+<style>
+  .map {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+  }
+  .map__frame {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border: 0;
+    background: var(--cream-100);
+  }
+  .map__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+</style>

@@ -1,0 +1,104 @@
+---
+import SectionHead from '@/components/SectionHead.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Inventado from '@/components/Inventado.astro';
+import { getSitio } from '@/lib/content';
+
+const sitio = await getSitio();
+const actualizado = '26 de octubre de 2026';
+---
+
+<BaseLayout
+  title="Política de privacidad"
+  description="Cómo trata la Iglesia Presbiteriana Pacto de Cristo los datos personales recibidos a través de su sitio web."
+>
+  <section class="section">
+    <article class="container--narrow prose legal">
+      <SectionHead eyebrow="Transparencia" title="Política de privacidad">
+        <p class="lead">Última actualización: {actualizado}.</p>
+      </SectionHead>
+
+      <p class="draft" role="note">
+        <strong>Borrador para revisión.</strong> Este texto fue preparado conforme a la Ley N° 19.628 y a la Ley N° 21.719 sobre protección
+        de datos personales, y debe ser revisado por el Consistorio y, idealmente, por un asesor legal antes de publicarse.
+      </p>
+
+      <h2>1. Responsable</h2>
+      <p>
+        {sitio.nombre}, con domicilio en {sitio.direccion.calle}, {sitio.direccion.comuna}, {sitio.direccion.ciudad}. Contacto para asuntos
+        de privacidad: <a href={`mailto:${sitio.contacto.email}`}>{sitio.contacto.email}</a>.
+      </p>
+
+      <h2>2. Qué datos recibimos</h2>
+      <p>
+        Solo los que tú nos entregas voluntariamente en el formulario de contacto: nombre, correo electrónico, teléfono (opcional), asunto y
+        mensaje. Ten presente que un mensaje (por ejemplo, una petición de oración) puede contener información sensible: compártela solo si
+        lo deseas.
+      </p>
+
+      <h2>3. Para qué los usamos</h2>
+      <p>
+        Exclusivamente para responder tu mensaje. No los usamos para publicidad, no los vendemos ni los cedemos a terceros, y no creamos
+        perfiles.
+      </p>
+
+      <h2>4. Base de licitud</h2>
+      <p>
+        Tu consentimiento, que otorgas al marcar la casilla correspondiente antes de enviar el formulario. Puedes retirarlo en cualquier
+        momento.
+      </p>
+
+      <h2>5. Cuánto tiempo los conservamos</h2>
+      <p>
+        El sitio web <strong>no almacena</strong> los mensajes: se transmiten cifrados y se entregan por correo electrónico a la casilla de
+        la iglesia. Conservamos esos correos solo mientras sea necesario para atender tu consulta y,{' '}
+        <Inventado>como máximo, 12 meses</Inventado>.
+      </p>
+
+      <h2>6. Proveedores que intervienen</h2>
+      <ul>
+        <li>
+          <strong>Cloudflare</strong>: alojamiento del sitio, protección contra ataques y verificación anti-spam (Turnstile).
+        </li>
+        <li>
+          <strong>Resend</strong>: entrega del correo con tu mensaje a la casilla de la iglesia.
+        </li>
+      </ul>
+      <p>Estos proveedores actúan como encargados de tratamiento y solo procesan los datos para prestar su servicio.</p>
+
+      <h2>7. Cookies y medición</h2>
+      <p>
+        Este sitio <strong>no usa cookies de seguimiento ni publicidad</strong>. Los videos de YouTube solo se cargan cuando presionas
+        «reproducir» (en modo de privacidad mejorada) y el mapa usa OpenStreetMap. Si se mide el tráfico, se hace con herramientas que no
+        usan cookies ni identifican a las personas.
+      </p>
+
+      <h2>8. Tus derechos</h2>
+      <p>
+        Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, portabilidad y bloqueo escribiendo a
+        <a href={`mailto:${sitio.contacto.email}`}>{sitio.contacto.email}</a>. Responderemos dentro de los plazos legales. Si consideras que
+        no hemos atendido tu solicitud, puedes recurrir a la autoridad de protección de datos personales competente.
+      </p>
+
+      <h2>9. Seguridad</h2>
+      <p>
+        El sitio funciona exclusivamente sobre HTTPS, aplica políticas de seguridad de contenido estrictas y no mantiene bases de datos con
+        información de visitantes.
+      </p>
+    </article>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal h2 {
+    font-size: var(--step-2);
+    margin-top: 2.25rem;
+  }
+  .draft {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-sm);
+    background: #fff6d6;
+    border-left: 4px solid var(--gold-500);
+    font-size: 0.95rem;
+  }
+</style>

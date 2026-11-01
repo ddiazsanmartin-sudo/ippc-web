@@ -1,0 +1,58 @@
+# Integración continua: se ejecuta en cada Pull Request y en cada push a main
+# (incluidos los commits que hace el panel de administración).
+# Antes de producción: fijar cada acción por SHA de commit (Dependabot los mantiene actualizados).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, tipos, tests y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependencias (lockfile estricto)
+        run: npm ci
+
+      - name: Auditoría de dependencias
+        run: npm audit --audit-level=high
+
+      - name: Lint (incluye reglas de accesibilidad)
+        run: npm run lint
+
+      - name: Formato
+        run: npm run format:check
+
+      - name: Tipos (TypeScript strictest)
+        run: npm run check
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+          TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+
+      - name: Tests unitarios
+        run: npm test
+
+      - name: Build (valida todo el contenido contra los esquemas)
+        run: npm run build
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+          TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA

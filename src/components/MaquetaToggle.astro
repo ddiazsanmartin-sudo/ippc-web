@@ -1,0 +1,96 @@
+---
+/** MAQUETA: leyenda y botón para mostrar u ocultar las marcas rojas (preferencia guardada en el navegador). */
+---
+
+<div class="maqueta" role="note">
+  <span class="maqueta__dot" aria-hidden="true"></span>
+  <span class="maqueta__text">Rojo = inventado (no viene del documento)</span>
+  <button type="button" class="maqueta__btn" data-maqueta-toggle aria-pressed="true">
+    Ocultar
+  </button>
+</div>
+
+<script>
+  const KEY = 'ippc-maqueta-marcas';
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-maqueta-toggle]');
+  const text = document.querySelector<HTMLElement>('.maqueta__text');
+
+  const apply = (on: boolean) => {
+    root.classList.toggle('marcas', on);
+    if (button) {
+      button.textContent = on ? 'Ocultar' : 'Mostrar';
+      button.setAttribute('aria-pressed', String(on));
+    }
+    if (text) text.textContent = on ? 'Rojo = inventado (no viene del documento)' : 'Marcas de maqueta ocultas';
+  };
+
+  let stored: string | null = null;
+  try {
+    stored = localStorage.getItem(KEY);
+  } catch {
+    /* almacenamiento no disponible: se usan las marcas visibles por defecto */
+  }
+  apply(stored !== 'off');
+
+  button?.addEventListener('click', () => {
+    const on = !root.classList.contains('marcas');
+    apply(on);
+    try {
+      localStorage.setItem(KEY, on ? 'on' : 'off');
+    } catch {
+      /* sin persistencia */
+    }
+  });
+</script>
+
+<style>
+  .maqueta {
+    position: fixed;
+    left: clamp(0.75rem, 2vw, 1.5rem);
+    bottom: clamp(0.75rem, 2vw, 1.5rem);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    max-width: calc(100vw - 6rem);
+    padding: 0.45rem 0.5rem 0.45rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: var(--white);
+    border: 2px solid #d32f2f;
+    box-shadow: 0 6px 20px rgb(14 21 48 / 0.18);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-900);
+  }
+  .maqueta__dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d32f2f;
+  }
+  .maqueta__btn {
+    flex: none;
+    min-height: 32px;
+    padding: 0.25rem 0.8rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: #d32f2f;
+    color: var(--white);
+    font: inherit;
+    cursor: pointer;
+  }
+  .maqueta__btn:hover {
+    background: #b71c1c;
+  }
+  @media (max-width: 520px) {
+    .maqueta__text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+</style>

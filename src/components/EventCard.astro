@@ -1,0 +1,149 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { endOf, formatDay, formatLongDate, formatMonthShort, formatTime } from '@/lib/dates';
+import { inventado, marca } from '@/lib/maqueta';
+import Icon from './Icon.astro';
+
+interface Props {
+  event: CollectionEntry<'actividades'>;
+  /** Muestra la descripción completa (página de actividades). */
+  detailed?: boolean;
+  headingLevel?: 'h3' | 'h4';
+}
+const { event, detailed = false, headingLevel: H = 'h3' } = Astro.props;
+const { titulo, fecha, fecha_fin, categoria, lugar, resumen, descripcion } = event.data;
+const parrafos = detailed && descripcion ? descripcion.split(/\n{2,}/) : [];
+---
+
+<!-- data-ends permite ocultar en el navegador las actividades que terminaron después del último build -->
+<article class:list={['event', marca(inventado.actividades.has(event.id))]} data-ends={endOf(event).toISOString()} data-event>
+  <time class="event__date" datetime={fecha.toISOString()}>
+    <span class="event__day">{formatDay(fecha)}</span>
+    <span class="event__month">{formatMonthShort(fecha)}</span>
+  </time>
+  <div class="event__body">
+    <p class="event__tag">{categoria}</p>
+    <H class="event__title">{titulo}</H>
+    <ul class="event__meta" role="list">
+      <li>
+        <Icon name="clock" size={16} />
+        {formatLongDate(fecha)} · {formatTime(fecha)}
+        {fecha_fin && ` a ${formatTime(fecha_fin)}`}
+      </li>
+      <li>
+        <Icon name="mapPin" size={16} />
+        {lugar}
+      </li>
+    </ul>
+    <p class="event__summary">{resumen}</p>
+    {parrafos.map((p) => (
+      <p class="event__text">{p}</p>
+    ))}
+  </div>
+</article>
+
+<style>
+  .event {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .event[hidden] {
+    display: none;
+  }
+  .event__date {
+    display: grid;
+    place-content: center;
+    width: 4.75rem;
+    height: 5.25rem;
+    border-radius: var(--radius);
+    background: var(--cream-100);
+    border-top: 4px solid var(--gold-500);
+    text-align: center;
+    line-height: 1;
+  }
+  .event__day {
+    font-family: var(--font-serif), serif;
+    font-size: 2.2rem;
+    color: var(--navy-900);
+  }
+  .event__month {
+    margin-top: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+  }
+  .event__tag {
+    display: inline-block;
+    margin: 0 0 0.35rem;
+    padding: 0.15rem 0.65rem;
+    border-radius: var(--radius-pill);
+    background: var(--blue-50);
+    color: var(--blue-700);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .event__title {
+    font-size: var(--step-1);
+    margin-bottom: 0.5rem;
+  }
+  .event__meta {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.6rem;
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--ink-500);
+  }
+  .event__meta li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+  }
+  .event__meta :global(svg) {
+    flex: none;
+    position: relative;
+    top: 0.18em;
+    color: var(--blue-700);
+  }
+  .event__summary,
+  .event__text {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+  .event__text {
+    margin-top: 0.75rem;
+  }
+  @media (max-width: 460px) {
+    .event {
+      grid-template-columns: 1fr;
+    }
+    .event__date {
+      width: auto;
+      height: auto;
+      grid-auto-flow: column;
+      gap: 0.5rem;
+      justify-content: start;
+      padding: 0.6rem 1rem;
+      border-top: 0;
+      border-left: 4px solid var(--gold-500);
+    }
+    .event__day {
+      font-size: 1.5rem;
+    }
+    .event__month {
+      margin: 0;
+      align-self: center;
+    }
+  }
+</style>

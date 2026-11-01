@@ -1,0 +1,106 @@
+---
+interface Item {
+  marca: string;
+  titulo: string;
+  texto: string;
+}
+interface Props {
+  items: Item[];
+  /** Variante sobre fondo oscuro. */
+  dark?: boolean;
+}
+const { items, dark = false } = Astro.props;
+---
+
+<ol class:list={['timeline', { 'timeline--dark': dark }]} role="list">
+  {items.map((item) => (
+    <li class="timeline__item">
+      <span class="timeline__mark">{item.marca}</span>
+      <div class="timeline__body">
+        <h3 class="timeline__title">{item.titulo}</h3>
+        <p>{item.texto}</p>
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .timeline {
+    --mark-w: 6.5rem;
+    --line-x: calc(var(--mark-w) + 1.15rem);
+    --line-color: var(--cream-200);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: var(--line-x);
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: var(--line-color);
+  }
+  .timeline--dark {
+    --line-color: rgb(255 255 255 / 0.18);
+  }
+  .timeline__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--mark-w) 1fr;
+    gap: 2.25rem;
+    padding-bottom: 2.25rem;
+  }
+  .timeline__item:last-child {
+    padding-bottom: 0;
+  }
+  .timeline__item::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--line-x) - 6px);
+    top: 0.55rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--gold-400);
+    box-shadow: 0 0 0 5px var(--white);
+  }
+  .timeline--dark .timeline__item::before {
+    box-shadow: 0 0 0 5px var(--navy-900);
+  }
+  .timeline__mark {
+    font-family: var(--font-serif), serif;
+    font-size: 1.45rem;
+    line-height: 1.3;
+    color: var(--gold-700);
+    text-align: right;
+  }
+  .timeline--dark .timeline__mark {
+    color: var(--gold-400);
+  }
+  .timeline__title {
+    font-size: var(--step-1);
+    margin-bottom: 0.35rem;
+  }
+  .timeline__body p {
+    margin: 0;
+  }
+  @media (max-width: 520px) {
+    .timeline::before {
+      left: 6px;
+    }
+    .timeline__item {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+      padding-left: 2rem;
+    }
+    .timeline__item::before {
+      left: 0;
+    }
+    .timeline__mark {
+      text-align: left;
+    }
+  }
+</style>
